@@ -1,0 +1,9 @@
+# imports
+importFrom(Matrix,Matrix)
+importFrom(spam,spam)
+#import(lattice)
+import(gptk)
+#export(DEtime)
+#export(print_DEtime)
+#export(plot_DEtime)
+exportPattern("^[[:alpha:]]+")

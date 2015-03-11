@@ -1,0 +1,14 @@
+Package: DEtime
+Type: Package
+Title: inferring the perturbation time from biological time course data 
+Version: 1.0
+Date: 2015-03-11
+Author: c(person("YANG","Jing", role =
+        c("aut","cre","trl"), email = "ynnjing@gmail.com"))
+Imports: spam,Matrix,gptk
+Maintainer: Jing Yang <ynnjing@gmail.com>
+Description: The DEtime package implements a toolkit for identifying the perturbation time point for two time series profiles obtained under control and perturbed conditions. It applies a Gaussian Process Regression model to the dataset and derives the full posterior distribution of the proposed perturbation time points. See DEtime_vignettes.pdf for more details.
+License: AGPL-3
+BugReports: ynnjing@gmail.com
+NeedsCompilation: no
+

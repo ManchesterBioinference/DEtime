@@ -1,0 +1,216 @@
+---
+title: "Inferring the perturbation time from biological time course data  --DEtime
+  package"
+author: "Jing Yang"
+date: "09/03/2015"
+output: pdf_document
+bibliography: mybib.bib
+---
+
+## Abstract
+Time course data is often used to study the dynamics in a biological process after perturation at certain time. Inferring the perturbation time under different scenarios in a biological process allows us to identify these critical moments and focus on any following activities in the process, which is of critical importance in understanding likely caucal relationships. In DEtime package, we propose a Bayesian method to infer the perturbation time from a control and perturbed system. A non-parametric Gaussian Process regression is applied in deriving the posterior distribution of the perturbation point. This vignette explains how to use the package. For further exposition of the algorithm, please refer to out paper[@Jing]
+
+## Description
+This package implements the Gaussian regression framework for perturbation time point inferrence in a two sample case. The package contains one main function: **DEtime**. 
+
+  The package works on the time course data from a wild-type and a perturbed system. Acting upon pre-defined testing perturbation time, the function goes over these perturbation time candidates and derives their likelihoods. From Bayes' theory, under a uniform prior assumption, the posterior distribution of the tested perturbation time is derived from their corresponding likeliooods. *Maximum a posterior (MAP)*, *mean* or *median* of the posterior distribution can be taken as the solution to the estimated perturbation time point.      
+
+#### Details  
+                     Package:  DEtime   
+                     Type:     Package
+                     Version:  1.0
+                     Date:     2015-03-09
+                     License:  GPL-3                
+ **Author(s)**  
+
+  Jing Yang  
+  
+**Maintainer**  
+
+  Jing Yang <ynnjing@gmail.com>
+   
+*****
+
+##**Functionss**  
+
+---------------------------------------------    
+DEtime  - Perturbation time inference
+---------------------------------------------   
+
+**Description**  
+
+
+**DEtime** is the main function in DEtime Package, which applies a mixedGP kernel to time course data under control and perturbed conditions. It returns the posterior distribution of these predefined perturbation time candidates and relevant statistical estimations of the inferred perturbation time point.  
+
+**Usage**   
+
+
+DEtime(times, ControlData, PerturbedData, replicate_no, gene_no, times_test=times, gene_ID=NULL)  
+
+**Arguments**  
+
+
+* **times**: experimental time points at which the control and perturbed time course data are measured;  
+
+* **times_list**: perturbation time points which will be evalued by **DEtime** function. **times_list** has to be in the range of times and evenly spaced. If this data is missing, **times** will be used as **times_list** ;  
+
+* **gene_no**: the number of genes studied in this algorithm.   
+
+* **replicate_no**: the replicate number provided in experiments.   
+
+* **ControlData**: The measured time course data under control condtion. The data is a matrix where each row represents the time course data for one particular gene.   
+
+* **PerturbedData**: The measured time course data under perturbed condtion. The data is a matrix where each row represents the time course data for one particular gene. The columns for both **ControlData** and  **PerturbedData** are ordered by the time sequencing followed by replicates, as shown in the Table below (the geneIDs are used for illustration purpose only, they are not included in the mearument data):    
+
+
+   geneIDs |        replicate 1      |        replicate 2          
+--------|-----------------------  |----------------------------
+gene 1  |$t_1$ $t_2$ ... $t_n$   |$t_1$ $t_2$ $...$  $t_n$
+gene 2  |$t_1$ $t_2$ ... $t_n$  |$t_1$ $t_2$ $...$ $t_n$
+
+* **gene_ID**: The ID of each gene investigated in the algorithm. If this value is missing, 1, 2, 3, $...$  will be used instead.  
+
+**Returns**  
+
+The function will return a **DEtimeOutput** object which contains:
+
+* $**result**: statistical estimations for the inferred perturbation time, which includes:  
+      + $**MAP**: _maximum a posterior_ solution to the inferred perturbation time  
+      + $**mean**: mean of the posterior distribution of the inferred perturbation time  
+      + $**median**: median of the posterior distribution of the inferred perturbation time  
+      + $**ptl5**: 5 percentile of the posterior distribution of the inferred perturbation time  
+      + $**ptl95**: 95 percentile of the posterior distribution of the inferred perturbation time  
+   
+* $**posterior**: posterior distribution of the tested perturbation time points  
+* $**model**: optimized GP model which will be used for later GP regression work   
+* $**best_param** : optimized hyperparameter for the optimized GP model  
+* $**originaltimes**: original experimental time points which will be used for future print or plot functions  
+* $**originaldata**: original measured time course data which will be used for future print or plot functions  
+* $**times_test**: tested perturbation time points  
+* $**gene_ID**: the ID of genes for the data  
+
+**Details**
+
+Both control and perturbed data have to be measured at the same time points with the same number of replicates. Replicates are required to be obtained across all time points. 
+
+**Examples**  
+
+```{r, eval=FALSE, message=FALSE}
+## read simulated example data
+library("DEtime")
+data(SimulatedData)
+res <- DEtime(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
+              replicate_no=replicate_no, gene_no=gene_no, times_test=times, 
+              gene_ID=gene_ID)
+```
+   
+----------------------------------------------------------------
+print_DEtime - print the results from DEtime function 
+----------------------------------------------------------------
+
+**Description**  
+
+
+The function prints the results returned from **DEtime** function, which will show the **gene_ID** associated with **MAP**, **mean**, **median**, **ptl5** (lower 5 percentile) and **ptl95** (upper 5 percentile) of the posterior distribution of inferred perturbation time points.  
+
+**Usage**  
+
+
+print_DEtime(DEtimeOutput)  
+
+**Argument**  
+
+
+* **DEtimeOutput**: the returned value from **DEtime** function  
+
+**Example**  
+
+
+```{r, message=FALSE}
+library("DEtime")
+## read simulated example data
+data(SimulatedData)
+res <- DEtime(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
+              replicate_no=replicate_no, gene_no=gene_no, times_test=times, 
+              gene_ID=gene_ID)
+print_DEtime(res)
+```
+----------------------------------------------------------
+plot_DEtime - plot the results of DEtime function
+----------------------------------------------------------
+           
+**Description**  
+
+
+**plot_DEtime** plots the results returned from **DEtime** function. The produced figures show the the posterior distribution of inferred perturbation time points on the upper panel and Gaussian Regression of the original data on the lower panel. Please note that the MAP solution of the perturbation point is taken as the optimized estimate to the perturbation point and Gaussian Regression is derived based upon this estimated perturabtion point.  
+
+**Usage**  
+
+
+plot_DEtime(DEtimeOutput, plot_gene_ID=NULL) 
+
+**Argument**  
+
+* **DEtimeOutput**: the returned value from **DEtime** function 
+* **plot_gene_ID**: the gene_IDs of those genes whose GP regression and posterior distribution of the perturbation time points will be plotted. If not supplied, all the genes will be plotted.  
+
+**Example**
+
+```{r, message=FALSE}
+library("DEtime")
+## read simulated example data
+data(SimulatedData)
+res <- DEtime(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
+              replicate_no=replicate_no, gene_no=gene_no, times_test=times_test, 
+              gene_ID=gene_ID)
+plot_DEtime(res,plot_gene_ID='gene1')
+```
+
+## Running the package on the real data used in our paper
+
+**Descriptions**  
+
+In this experiment, the aim is to study the transcriptional change occuring in Arabidopsis
+following inoculation with P. syringae pv. tomato DC3000 (PtoDC3000) versus the disarmed strain Pto DC3000hrpA 
+
+The data contain three different time series:   
+
+* a control time series comprising challenge with 10 mM
+MgCl2 (control condition)
+* infection of Arabidopsis with
+virulent Pseudomonas syringage pv. tomato DC3000, which leads
+to disease development (perturbed condition 1);
+* infection of Arabidopsis with the disarmed strain DC3000hrpA (perturbed condition 2)   
+
+In this example, the perturbation time between perturbed condition 1 and perturbed condition 2 is inferred.
+
+```{r, fig.height=5,fig.width=6}
+library("DEtime")
+## Original experimental time points
+times <- matrix(c(0,2,3,4,6,7,8,10,11,12,14,16,17.5), ncol=1)
+## number of replicates 
+replicate_no  <- 4
+## number of genes that will be studied in this example
+gene_no <- 4
+## read data from file
+data(RealData)
+## PerturbedData <- data.matrix(Data[1:gene_no, 
+##                                  (2*length(times)*replicate_no+2):dim(Data)[2]]) 
+## ControlData <- data.matrix(Data[1:gene_no, 
+##                                (length(times)*replicate_no+2):(2*length(times)*replicate_no+1)])
+## define the perturbation time point candidates
+times_test <- seq(min(times),max(times),by=(max(times)-min(times))/(4*length(times)))
+## gene_ID
+## gene_ID <- Data[1:gene_no,1]
+## inferring the perturbation time point
+res <- DEtime(times = times, ControlData = ControlData[1:gene_no,], PerturbedData=PerturbedData[1:gene_no,], 
+              replicate_no=replicate_no, gene_no=gene_no, times_test=times_test, 
+              gene_ID=gene_ID[1:gene_no])
+## Print a summary of the results
+print_DEtime(res)
+## plot the first data
+plot_DEtime(res, plot_gene_ID='Probe1')
+```
+  
+## References   
+[Jing]: Jing Yang, Christopher A. Penfold, Murray R. Grant and Magnus Rattray, Inferring the perturbation time from biological time course data, **Bioinformatics** (submitted)
