@@ -13,7 +13,7 @@ Time course data is often used to study the dynamics in a biological process aft
 ## Description
 This package implements the Gaussian regression framework for perturbation time point inferrence in a two sample case. The package contains one main function: **DEtime**. 
 
-  The package works on the time course data from a wild-type and a perturbed system. Acting upon pre-defined testing perturbation time, the function goes over these perturbation time candidates and derives their likelihoods. From Bayes' theory, under a uniform prior assumption, the posterior distribution of the tested perturbation time is derived from their corresponding likeliooods. *Maximum a posterior (MAP)*, *mean* or *median* of the posterior distribution can be taken as the solution to the estimated perturbation time point.      
+The package works on the time course data from a wild-type and a perturbed system. Acting upon pre-defined testing perturbation time, the package goes over these perturbation time candidates and derives their likelihoods. From Bayes' theory, under a uniform prior assumption, the posterior distribution of the tested perturbation time is derived from their corresponding likeliooods. *Maximum a posterior (MAP)*, *mean* or *median* of the posterior distribution can be taken as the solution to the estimated perturbation time point.      
 
 #### Details  
                      Package:  DEtime   
