@@ -14,14 +14,16 @@ function(DEtimeOutput, plot_gene_ID=NULL){
   
   if (is.null(plot_gene_ID)){
     seq_genes <- seq(1,gene_no)
+    cat('All genes will be plotted \n')
     }
- else {
+  else {
     seq_genes <- which(plot_gene_ID==gene_ID)
     }
-  if (is.null(seq_genes)) {
-   stop(" the gene_ID supplied for plotting is out of the range of original gene_ID")
+    
+  if (!length(seq_genes)) {
+   stop(" the gene_ID supplied for plotting is not in the range of original gene_IDs")
    }
-  
+   
   gene_no <- dim(data)[1]
   tstar <- matrix(seq(min(times)-(2*(max(times)-min(times))/10), max(times), length=200), ncol=1)
   tstar2 <- matrix(rep(tstar,2, bycol=TRUE), ncol=1)
@@ -33,8 +35,9 @@ function(DEtimeOutput, plot_gene_ID=NULL){
     invKtrain <- .jitCholInv(Ktrain, silent=TRUE)$invM
     yPred <- t(Kx) %*% invKtrain %*% y
     yVar <- diag(abs(kernCompute(model$kern, tstar2) - t(Kx) %*% invKtrain %*% Kx))
-
+    dev.new()
     #pdf(paste0(gene_ID[idx],".pdf"), width=7, height=5)
+    cat(paste(gene_ID[idx], 'is plotted\n'))
     .gpPlot_DEtime(model, tstar2, yPred, yVar, cbind(times_test,posterior[idx,]), title =paste('GPR result for ',gene_ID[idx], ' by DEtime package', sep=""))
     #dev.off()
     }

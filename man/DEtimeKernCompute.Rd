@@ -1,0 +1,35 @@
+\name{DEtimeKernCompute}
+\Rdversion{1.0}
+\alias{DEtimeKernCompute}
+\title{Compute the DEtime kernel given the parameters and X.}
+\description{
+  Compute the DEtime kernel given the parameters and X.
+}
+\usage{
+DEtimeKernCompute(kern, x, x2)
+}
+\arguments{
+  \item{kern}{DEtime kernel structure to be computed.}
+  \item{x}{depending on the number of inputs, x can be the input data matrix
+    (rows are data points) to the kernel computation, or
+    the first input matrix to the kernel computation (forms the rows of the kernel).}
+  \item{x2}{second input matrix to the kernel computation (forms the columns of the kernel).}
+}
+\details{
+  \code{K <- DEtimeKernCompute(kern, x)}
+  computes a DEtime kernel matrix given an input data matrix.
+
+  \code{K <- DEtimeKernCompute(kern, x1, x2)}
+  computes a DEtime kernel matrix for the given kernel type given two input data matrices, one for the rows and one for the columns.
+  
+  
+}
+\value{
+  \item{K}{computed elements of the kernel structure.}
+}
+\examples{
+kern <- list()
+kern <- DEtimeKernParamInit(kern)
+K <- DEtimeKernCompute(kern, as.matrix(3:8))
+}
+\keyword{kernel}

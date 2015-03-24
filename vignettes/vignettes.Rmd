@@ -11,7 +11,7 @@ bibliography: mybib.bib
 Time course data is often used to study the dynamics in a biological process after perturation at certain time. Inferring the perturbation time under different scenarios in a biological process allows us to identify these critical moments and focus on any following activities in the process, which is of critical importance in understanding likely caucal relationships. In DEtime package, we propose a Bayesian method to infer the perturbation time from a control and perturbed system. A non-parametric Gaussian Process regression is applied in deriving the posterior distribution of the perturbation point. This vignette explains how to use the package. For further exposition of the algorithm, please refer to out paper[@Jing]
 
 ## Description
-This package implements the Gaussian regression framework for perturbation time point inferrence in a two sample case. The package contains one main function: **DEtime**. 
+This package implements the Gaussian regression framework for perturbation time point inferrence in a two sample case. The package contains two main functions: **DEtime**, which is used to find out perturbation point of genes, and **DEtime_rank**, which is used to filter these silent genes before carrying out perturbation point inference by **DEtime** function. 
 
 The package works on the time course data from a wild-type and a perturbed system. Acting upon pre-defined testing perturbation time, the package goes over these perturbation time candidates and derives their likelihoods. From Bayes' theory, under a uniform prior assumption, the posterior distribution of the tested perturbation time is derived from their corresponding likeliooods. *Maximum a posterior (MAP)*, *mean* or *median* of the posterior distribution can be taken as the solution to the estimated perturbation time point.      
 
@@ -52,12 +52,6 @@ DEtime(times, ControlData, PerturbedData, replicate_no, gene_no, times_test=time
 
 * **times**: experimental time points at which the control and perturbed time course data are measured;  
 
-* **times_list**: perturbation time points which will be evalued by **DEtime** function. **times_list** has to be in the range of times and evenly spaced. If this data is missing, **times** will be used as **times_list** ;  
-
-* **gene_no**: the number of genes studied in this algorithm.   
-
-* **replicate_no**: the replicate number provided in experiments.   
-
 * **ControlData**: The measured time course data under control condtion. The data is a matrix where each row represents the time course data for one particular gene.   
 
 * **PerturbedData**: The measured time course data under perturbed condtion. The data is a matrix where each row represents the time course data for one particular gene. The columns for both **ControlData** and  **PerturbedData** are ordered by the time sequencing followed by replicates, as shown in the Table below (the geneIDs are used for illustration purpose only, they are not included in the mearument data):    
@@ -68,13 +62,19 @@ DEtime(times, ControlData, PerturbedData, replicate_no, gene_no, times_test=time
 gene 1  |$t_1$ $t_2$ ... $t_n$   |$t_1$ $t_2$ $...$  $t_n$
 gene 2  |$t_1$ $t_2$ ... $t_n$  |$t_1$ $t_2$ $...$ $t_n$
 
+* **replicate_no**: the replicate number provided in experiments.   
+
+* **gene_no**: the number of genes studied in this algorithm.   
+
+* **times_list**: perturbation time points which will be evalued by **DEtime** function. **times_list** has to be in the range of times and evenly spaced. If this data is missing, **times** will be used as **times_list** ;  
+
 * **gene_ID**: The ID of each gene investigated in the algorithm. If this value is missing, 1, 2, 3, $...$  will be used instead.  
 
 **Returns**  
 
 The function will return a **DEtimeOutput** object which contains:
 
-* $**result**: statistical estimations for the inferred perturbation time, which includes:  
+* **result**: statistical estimations for the inferred perturbation time, which includes:  
       + $**MAP**: _maximum a posterior_ solution to the inferred perturbation time  
       + $**mean**: mean of the posterior distribution of the inferred perturbation time  
       + $**median**: median of the posterior distribution of the inferred perturbation time  
@@ -100,10 +100,68 @@ Both control and perturbed data have to be measured at the same time points with
 library("DEtime")
 data(SimulatedData)
 res <- DEtime(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
-              replicate_no=replicate_no, gene_no=gene_no, times_test=times, 
-              gene_ID=gene_ID)
+              replicate_no=replicate_no, gene_no=gene_no, times_test=times, gene_ID=gene_ID)
 ```
-   
+
+
+##**Functionss**  
+
+------------------------------------------------------------    
+DEtime_rank  - Rank time course data by log-likelihood ratio
+------------------------------------------------------------   
+
+**Description**  
+
+
+**DEtime_rank** is the function used for filtering silent genes in DEtime Package. In this function, an independent GP and an integrated GP are applied to model the time course data under control and perturbed conditions, respectively. The log-likelihood ratio of the GP modeling result is used as an indication of the differential expression of the studied gene. A higher rank generally indicates better differential expression.   
+
+**Usage**   
+
+
+DEtime_rank(times, ControlData, PerturbedData, replicate_no, gene_no, gene_ID=NULL, savefile=TRUE)  
+
+**Arguments**  
+
+
+* **times**: experimental time points at which the control and perturbed time course data are measured;   
+
+* **ControlData**: The measured time course data under control condtion. The data is a matrix where each row represents the time course data for one particular gene.   
+
+* **PerturbedData**: The measured time course data under perturbed condtion. The data is a matrix where each row represents the time course data for one particular gene. The columns for both **ControlData** and  **PerturbedData** are ordered by the time sequencing followed by replicates, as shown in the Table below (the geneIDs are used for illustration purpose only, they are not included in the mearument data):    
+
+
+   geneIDs |        replicate 1      |        replicate 2          
+--------|-----------------------  |----------------------------
+gene 1  |$t_1$ $t_2$ ... $t_n$   |$t_1$ $t_2$ $...$  $t_n$
+gene 2  |$t_1$ $t_2$ ... $t_n$  |$t_1$ $t_2$ $...$ $t_n$
+
+* **replicate_no**: the replicate number provided in experiments.  
+
+* **gene_no**: the number of genes studied in this algorithm.   
+
+* **gene_ID**: The ID of each gene investigated in the algorithm. If this value is missing, 1, 2, 3, $...$  will be used instead.  
+
+* **savefile**: A BOOLEAN parameter used to indicate if the ranking list will be saved in a file or not. If set to TRUE, the result will be saved in DEtime_rank.txt
+
+**Returns**  
+
+The function will return a table which contains the gene_IDs as the first column and the associated loglikelihood ratio as the second column.  
+
+**Details**
+
+Both control and perturbed data have to be measured at the same time points with the same number of replicates. Replicates are required to be obtained across all time points. 
+
+**Examples**  
+
+```{r, eval=FALSE, message=FALSE}
+## read simulated example data
+library("DEtime")
+data(SimulatedData)
+res <- DEtime_rank(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
+              replicate_no=replicate_no, gene_no=gene_no, gene_ID=gene_ID, savefile=TRUE)
+```
+
+
 ----------------------------------------------------------------
 print_DEtime - print the results from DEtime function 
 ----------------------------------------------------------------
@@ -135,6 +193,7 @@ res <- DEtime(times = times, ControlData = ControlData, PerturbedData=PerturbedD
               gene_ID=gene_ID)
 print_DEtime(res)
 ```
+
 ----------------------------------------------------------
 plot_DEtime - plot the results of DEtime function
 ----------------------------------------------------------

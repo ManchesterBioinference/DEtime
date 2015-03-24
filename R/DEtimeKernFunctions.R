@@ -8,7 +8,6 @@ function (kern, x, x2) {
   }
   l <- dim(x)[1]/(2*replicate_no)
   x0 <- x[1:l]
-  #browser()
 
   if ( nargs() < 3 ) {
     replicate_no2 <- replicate_no
@@ -16,14 +15,11 @@ function (kern, x, x2) {
     m21 <- .dist2(x0,xp)
     m22 <- .dist2(xp,x0)
     l2 <- l
-    #print(x0)
-    #print(xp)
     if (xp>=max(x0)) { 
       pos1 <- length(x0)}
     else {
       pos1 <- max(min(which((x0<=xp)==FALSE))-1, 1)}
     
-    if (is.infinite(pos1)) {pos1 <- length(x0)}
     pos2 <- pos1
 
     flag <- TRUE
@@ -39,8 +35,9 @@ function (kern, x, x2) {
     n2 <- .dist2(xnew,xnew)
     m21 <- .dist2(xnew,xp)
     m22 <- .dist2(xp,xnew)
-    pos1 <- max(min(which((xnew<=xp)==FALSE))-1)
-    if (is.infinite(pos1)) {pos1 <- length(xnew)}
+    if (xp >= max(xnew)) { pos1 <- length(xnew)}
+    else {
+    pos1 <- max(min(which((xnew<=xp)==FALSE))-1)}
     pos2 <- pos1
     flag <- FALSE
   }
@@ -55,7 +52,6 @@ function (kern, x, x2) {
     k_0[1:l,1:l2] <- kern$variance*exp(-n2*wi2)
     k_0[(l+1):(2*l),(l2+1):(2*l2)] <- k_0[1:l,1:l2]
     k_0[1:l,(l2+1):(2*l2)] <- exp(-wi2*m21)%*%exp(-wi2*m22)/kern$variance
-    #k_0[(l+1):(2*l),1:l2] <- t(exp(-wi2*m22))%*%t(exp(-wi2*m21))/kern$variance
     k_0[(l+1):(2*l),1:l2] <- k_0[1:l,(l2+1):(2*l2)]
       
     k0 <- k_0
@@ -73,7 +69,6 @@ function (kern, x, x2) {
     
     l0 <- l+l2
     k_0 <- matrix(, nrow = 2*l0, ncol= 2*l0)
-    #browser()
     k_0[1:l0,1:l0] <- kern$variance*exp(-n2*wi2)
     k_0[(l0+1):(2*l0),(l0+1):(2*l0)] <- k_0[1:l0,1:l0]
     k_0[1:l0,(l0+1):(2*l0)] <- exp(-wi2*m21)%*%exp(-wi2*m22)/kern$variance
@@ -81,7 +76,6 @@ function (kern, x, x2) {
     
     k_1 <- k_0
     if (pos1 > 0) {
-      #browser()
       k_1[(l0+1):(l0+pos1),] <- k_0[1:pos1,]
       if (pos2 > 0){
         k_1[,(l0+1):(l0+pos2)] <- k_0[,1:pos2]
@@ -132,7 +126,6 @@ function (kern, x, x2) {
   k01 <- k0[rep(1:l,replicate_no), rep((l2+1):(2*l2),replicate_no2)]
   k10 <- k0[rep((l+1):(2*l),replicate_no), rep(1:l2,replicate_no2)]
   k11 <- k0[rep((l+1):(2*l),replicate_no), rep((l2+1):(2*l2),replicate_no2)]  
- #browser()
   
   k <- rbind(cbind(k00,k01),cbind(k10,k11))
   
@@ -195,7 +188,8 @@ function (kern, x, x2, covGrad) {
     dist2xxp2 <- .dist2(xp,x0)
     l2 <- l
     covGrad <- x2
-    pos1 <- max(min(which((x0<xp)==FALSE))-1, 0)
+    if (xp >= max(x0)) { pos1 <- length(x0)}
+    else { pos1 <- max(min(which((x0<xp)==FALSE))-1, 0)}
     pos2 <- pos1
     flag <- FALSE      
     
@@ -214,7 +208,8 @@ function (kern, x, x2, covGrad) {
     dist2xx <- .dist2(xnew,xnew)
     dist2xxp1 <- .dist2(xnew,xp)
     dist2xxp2 <- .dist2(xp,xnew)
-    pos1 <- max(min(which((xnew<xp)==FALSE))-1,0)
+    if (xp >= max(xnew)) { pos1 <- length(xnew)}
+    else {pos1 <- max(min(which((xnew<xp)==FALSE))-1,0)}
     pos2 <- pos1
     flag <- TRUE
   }
