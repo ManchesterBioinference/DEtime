@@ -21,7 +21,7 @@ There are different ways to install DEtime:
 * download the tarball file [**DEtime_1.0.tar.gz**](https://github.com/ManchesterBioinference/DEtime/blob/master/DEtime_1.0.tar.gz) and install it:
 
    ```R
-   install.packages("DEtime_1.0.tar.gz", repos=NULL)
+   install.packages("DEtime_1.0.tar.gz", repos=NULL, type="source")
    ```
 
 ## Getting Started
