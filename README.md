@@ -18,7 +18,7 @@ There are different ways to install DEtime:
    install_github("ManchesterBioinference/DEtime")
    ```
 
-* download the tarball file **DEtime_1.0.tar.gz** from https://github.com/ManchesterBioinference/DEtime/ page and install it:
+* download the tarball file **DEtime_1.0.tar.gz** from https://github.com/ManchesterBioinference/DEtime/DEtime_1.0.tar.gz and install it:
 
    ```R
    install.packages("DEtime_1.0.tar.gz", repos=NULL)
@@ -33,8 +33,7 @@ The package contains two main functions: **DEtime_infer** and **DEtime_rank**.
 
 The user is required to provide _times_, _ControlData_, _PerturbedData_, _replicate_no_, _gene_no_, etc to use
 these two functions. For explanation of these arguments, please refer to the 
-[vignettes](https://github.com/ManchesterBioinference/DEtime/tree/master/vignettes/vignettes.pdf) or 
-[package helpfile](https://github.com/ManchesterBioinference/DEtime/tree/master/man/DEtime.Rd) asscoiated with this package.
+[vignettes](https://github.com/ManchesterBioinference/DEtime/tree/master/vignettes/vignettes.pdf) asscoiated with this package.
 
 ## Examples
 
