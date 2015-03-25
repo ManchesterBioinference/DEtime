@@ -11,7 +11,7 @@ bibliography: mybib.bib
 Time course data is often used to study the dynamics in a biological process after perturation at certain time. Inferring the perturbation time under different scenarios in a biological process allows us to identify these critical moments and focus on any following activities in the process, which is of critical importance in understanding likely caucal relationships. In DEtime package, we propose a Bayesian method to infer the perturbation time from a control and perturbed system. A non-parametric Gaussian Process regression is applied in deriving the posterior distribution of the perturbation point. This vignette explains how to use the package. For further exposition of the algorithm, please refer to out paper[@Jing]
 
 ## Description
-This package implements the Gaussian regression framework for perturbation time point inferrence in a two sample case. The package contains two main functions: **DEtime**, which is used to find out perturbation point of genes, and **DEtime_rank**, which is used to filter these silent genes before carrying out perturbation point inference by **DEtime** function. 
+This package implements the Gaussian regression framework for perturbation time point inferrence in a two sample case. The package contains two main functions: **DEtime_infer**, which is used to find out perturbation point of genes, and **DEtime_rank**, which is used to filter these silent genes before carrying out perturbation point inference by **DEtime_infer** function. 
 
 The package works on the time course data from a wild-type and a perturbed system. Acting upon pre-defined testing perturbation time, the package goes over these perturbation time candidates and derives their likelihoods. From Bayes' theory, under a uniform prior assumption, the posterior distribution of the tested perturbation time is derived from their corresponding likeliooods. *Maximum a posterior (MAP)*, *mean* or *median* of the posterior distribution can be taken as the solution to the estimated perturbation time point.      
 
@@ -40,7 +40,7 @@ DEtime  - Perturbation time inference
 **Description**  
 
 
-**DEtime** is the main function in DEtime Package, which applies a mixedGP kernel to time course data under control and perturbed conditions. It returns the posterior distribution of these predefined perturbation time candidates and relevant statistical estimations of the inferred perturbation time point.  
+**DEtime_infer** is the main function in DEtime Package, which applies a mixedGP kernel to time course data under control and perturbed conditions. It returns the posterior distribution of these predefined perturbation time candidates and relevant statistical estimations of the inferred perturbation time point.  
 
 **Usage**   
 
@@ -66,7 +66,7 @@ gene 2  |$t_1$ $t_2$ ... $t_n$  |$t_1$ $t_2$ $...$ $t_n$
 
 * **gene_no**: the number of genes studied in this algorithm.   
 
-* **times_list**: perturbation time points which will be evalued by **DEtime** function. **times_list** has to be in the range of times and evenly spaced. If this data is missing, **times** will be used as **times_list** ;  
+* **times_list**: perturbation time points which will be evalued by **DEtime_infer** function. **times_list** has to be in the range of times and evenly spaced. If this data is missing, **times** will be used as **times_list** ;  
 
 * **gene_ID**: The ID of each gene investigated in the algorithm. If this value is missing, 1, 2, 3, $...$  will be used instead.  
 
@@ -169,7 +169,7 @@ print_DEtime - print the results from DEtime function
 **Description**  
 
 
-The function prints the results returned from **DEtime** function, which will show the **gene_ID** associated with **MAP**, **mean**, **median**, **ptl5** (lower 5 percentile) and **ptl95** (upper 5 percentile) of the posterior distribution of inferred perturbation time points.  
+The function prints the results returned from **DEtime_infer** function, which will show the **gene_ID** associated with **MAP**, **mean**, **median**, **ptl5** (lower 5 percentile) and **ptl95** (upper 5 percentile) of the posterior distribution of inferred perturbation time points.  
 
 **Usage**  
 
@@ -179,7 +179,7 @@ print_DEtime(DEtimeOutput)
 **Argument**  
 
 
-* **DEtimeOutput**: the returned value from **DEtime** function  
+* **DEtimeOutput**: the returned value from **DEtime_infer** function  
 
 **Example**  
 
@@ -201,7 +201,7 @@ plot_DEtime - plot the results of DEtime function
 **Description**  
 
 
-**plot_DEtime** plots the results returned from **DEtime** function. The produced figures show the the posterior distribution of inferred perturbation time points on the upper panel and Gaussian Regression of the original data on the lower panel. Please note that the MAP solution of the perturbation point is taken as the optimized estimate to the perturbation point and Gaussian Regression is derived based upon this estimated perturabtion point.  
+**plot_DEtime** plots the results returned from **DEtime_infer** function. The produced figures show the the posterior distribution of inferred perturbation time points on the upper panel and Gaussian Regression of the original data on the lower panel. Please note that the MAP solution of the perturbation point is taken as the optimized estimate to the perturbation point and Gaussian Regression is derived based upon this estimated perturabtion point.  
 
 **Usage**  
 
@@ -210,7 +210,7 @@ plot_DEtime(DEtimeOutput, plot_gene_ID=NULL)
 
 **Argument**  
 
-* **DEtimeOutput**: the returned value from **DEtime** function 
+* **DEtimeOutput**: the returned value from **DEtime_infer** function 
 * **plot_gene_ID**: the gene_IDs of those genes whose GP regression and posterior distribution of the perturbation time points will be plotted. If not supplied, all the genes will be plotted.  
 
 **Example**
