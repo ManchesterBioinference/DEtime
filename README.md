@@ -38,6 +38,8 @@ these two functions. For explanation of these arguments, please refer to the
 ## Examples
 
 ```R
+library(DEtime)
+
 ### inport simulated dataset
 data(SimulatedData)
 
