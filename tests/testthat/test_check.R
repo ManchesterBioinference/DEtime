@@ -1,6 +1,5 @@
 library(DEtime)
 
-
 test_that("missing arguments handling", {
     data(SimulatedData)
     expect_that(DEtime_infer(times), throws_error())
