@@ -34,7 +34,7 @@ The package works on the time course data from a wild-type and a perturbed syste
 ##**Functionss**  
 
 ---------------------------------------------    
-DEtime  - Perturbation time inference
+DEtime_infer  - Perturbation time inference
 ---------------------------------------------   
 
 **Description**  
@@ -45,7 +45,7 @@ DEtime  - Perturbation time inference
 **Usage**   
 
 
-DEtime(times, ControlData, PerturbedData, replicate_no, gene_no, times_test=times, gene_ID=NULL)  
+DEtime_infer(times, ControlData, PerturbedData, replicate_no, gene_no, times_test=times, gene_ID=NULL)  
 
 **Arguments**  
 
@@ -99,7 +99,7 @@ Both control and perturbed data have to be measured at the same time points with
 ## read simulated example data
 library("DEtime")
 data(SimulatedData)
-res <- DEtime(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
+res <- DEtime_infer(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
               replicate_no=replicate_no, gene_no=gene_no, times_test=times, gene_ID=gene_ID)
 ```
 
@@ -188,7 +188,7 @@ print_DEtime(DEtimeOutput)
 library("DEtime")
 ## read simulated example data
 data(SimulatedData)
-res <- DEtime(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
+res <- DEtime_infer(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
               replicate_no=replicate_no, gene_no=gene_no, times_test=times, 
               gene_ID=gene_ID)
 print_DEtime(res)
@@ -219,56 +219,45 @@ plot_DEtime(DEtimeOutput, plot_gene_ID=NULL)
 library("DEtime")
 ## read simulated example data
 data(SimulatedData)
-res <- DEtime(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
+res <- DEtime_infer(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
               replicate_no=replicate_no, gene_no=gene_no, times_test=times_test, 
               gene_ID=gene_ID)
 plot_DEtime(res,plot_gene_ID='gene1')
 ```
 
-## Running the package on the real data used in our paper
+## Run the package on the real data used in our paper and plot the one with top loglikelihood ratio
 
 **Descriptions**  
 
 In this experiment, the aim is to study the transcriptional change occuring in Arabidopsis
 following inoculation with P. syringae pv. tomato DC3000 (PtoDC3000) versus the disarmed strain Pto DC3000hrpA 
 
-The data contain three different time series:   
+The data contain two different time series:   
 
-* a control time series comprising challenge with 10 mM
-MgCl2 (control condition)
 * infection of Arabidopsis with
 virulent Pseudomonas syringage pv. tomato DC3000, which leads
-to disease development (perturbed condition 1);
-* infection of Arabidopsis with the disarmed strain DC3000hrpA (perturbed condition 2)   
+to disease development (perturbed condition 1), referred as ControlData in the dataset
+* infection of Arabidopsis with the disarmed strain DC3000hrpA (perturbed condition 2), 
+referred as PerturbedData in the dataset    
 
 In this example, the perturbation time between perturbed condition 1 and perturbed condition 2 is inferred.
 
 ```{r, fig.height=5,fig.width=6}
 library("DEtime")
-## Original experimental time points
-times <- matrix(c(0,2,3,4,6,7,8,10,11,12,14,16,17.5), ncol=1)
-## number of replicates 
-replicate_no  <- 4
-## number of genes that will be studied in this example
-gene_no <- 4
-## read data from file
+## import data
 data(RealData)
-## PerturbedData <- data.matrix(Data[1:gene_no, 
-##                                  (2*length(times)*replicate_no+2):dim(Data)[2]]) 
-## ControlData <- data.matrix(Data[1:gene_no, 
-##                                (length(times)*replicate_no+2):(2*length(times)*replicate_no+1)])
-## define the perturbation time point candidates
-times_test <- seq(min(times),max(times),by=(max(times)-min(times))/(4*length(times)))
-## gene_ID
-## gene_ID <- Data[1:gene_no,1]
-## inferring the perturbation time point
-res <- DEtime(times = times, ControlData = ControlData[1:gene_no,], PerturbedData=PerturbedData[1:gene_no,], 
+## calculate the loglikelihood ratio for each gene
+res_rank <- DEtime_rank(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
+              replicate_no=replicate_no, gene_no=gene_no, gene_ID=gene_ID)
+
+## inferring the perturbation point by DEtime_infer
+res <- DEtime_infer(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
               replicate_no=replicate_no, gene_no=gene_no, times_test=times_test, 
-              gene_ID=gene_ID[1:gene_no])
+              gene_ID=gene_ID)
 ## Print a summary of the results
 print_DEtime(res)
-## plot the first data
-plot_DEtime(res, plot_gene_ID='Probe1')
+## plot the gene with top loglikelihood ratio
+plot_DEtime(res, plot_gene_ID=gene_ID[which.max(res_rank[,2])])
 ```
   
 ## References   
