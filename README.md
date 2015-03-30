@@ -4,7 +4,7 @@ This package implements the Gaussian regression framework for perturbation time 
 
 ## Installation
 
-There are different ways to install DEtime:
+There are two ways to install DEtime:
 * use `devtools` package: 
   + Install and load the `devtools` package to be able to directly install R packages hosted on github :
 
@@ -18,8 +18,14 @@ There are different ways to install DEtime:
    install_github("ManchesterBioinference/DEtime")
    ```
 
-* download the tarball file [**DEtime_1.0.tar.gz**](https://github.com/ManchesterBioinference/DEtime/blob/master/DEtime_1.0.tar.gz) and install it:
-
+* download the tarball file [**DEtime_1.0.tar.gz**](https://github.com/ManchesterBioinference/DEtime/blob/master/DEtime_1.0.tar.gz). 
+  + Install the dependent packages **spam** and **gptk** first:
+  ```R
+  install.packages("spam")
+  install.packages("gptk")
+  ```
+  
+  + Install the tarball
    ```R
    install.packages("DEtime_1.0.tar.gz", repos=NULL, type="source")
    ```
