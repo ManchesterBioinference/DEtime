@@ -59,8 +59,8 @@ idx <- which(res_rank[,2]>4)
 ### go on with the perturbation time inference if some of the data has passed the threshould test 
 if (length(idx)>0){
      res <- DEtime_infer(times = times, ControlData = ControlData[idx,], 
-     PerturbedData=PerturbedData[idx,], replicate_no=replicate_no, gene_no=length(idx), times_test=times,     
-     gene_ID=gene_ID[idx])
+     PerturbedData=PerturbedData[idx,], replicate_no=replicate_no, gene_no=length(idx), 
+     times_test=times, gene_ID=gene_ID[idx])
 
 ### Print a summary of the results
 print_DEtime(res)
