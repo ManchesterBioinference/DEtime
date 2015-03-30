@@ -1,5 +1,5 @@
 # DEtime
-DEtime is a R package for two-sample time series analysis using Gaussian process methods. 
+DEtime is an R package for two-sample time series analysis using Gaussian process methods. 
 This package implements the Gaussian regression framework for perturbation time point inferrence in a two sample case. 
 
 ## Installation
