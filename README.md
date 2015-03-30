@@ -19,7 +19,7 @@ There are two ways to install DEtime:
    ```
 
 * download the tarball file [**DEtime_1.0.tar.gz**](https://github.com/ManchesterBioinference/DEtime/blob/master/DEtime_1.0.tar.gz). 
-  + Install the dependent packages **spam** and **gptk** first:
+  + Install the dependent packages, **spam** and **gptk**, first:
   ```R
   install.packages("spam")
   install.packages("gptk")
