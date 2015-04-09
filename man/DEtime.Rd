@@ -21,7 +21,7 @@ res_rank <- DEtime_rank(times = times, ControlData = ControlData[1:2,],
   PerturbedData=PerturbedData[1:2,], replicate_no=replicate_no, gene_no=2,
   gene_ID=gene_ID[1:2], savefile=TRUE)
 
-### Get the index of these data with loglikelihood ratio larger than 4
+### Get the index of these data with loglikelihood ratio larger than 45
 idx <- which(res_rank[,2]>45)
 
 if (length(idx)>0){
@@ -30,7 +30,7 @@ if (length(idx)>0){
         times_test=times, gene_ID=gene_ID[idx])
      ### Print a summary of the results
      print_DEtime(res)
-     ### Plot results of the first gene
+     ### Plot the result of the gene with top loglikelihood ratio
      plot_DEtime(res,gene_ID[idx[1]])
  }
 }
