@@ -1,21 +1,21 @@
-#' @title Compute the DEtime kernel given the parameters and X
-#' @param kern DEtime kernel structure to be computed
+#' @title Compute the DEtime Matern 32 kernel given the parameters and X
+#' @param kern DEtime Matern 32 kernel structure to be computed
 #' @param x Depending on the number of inputs, x can be the input data matrix (rows are data points) to the kernel computation, or the first input matrix to the kernel computation (forms the rows of the kernel)
 #' @param x2 Second input matrix to the kernel computation (forms the columns of the kernel)
 #' @return 
-#'    DEtime kernel structure.
+#'    DEtime Matern32 kernel structure.
 #' @description
-#'    Compute the DEtime kernel given the parameters and X.
+#'    Compute the DEtime Matern32 kernel given the parameters and X.
 #' @details
-#'    \code{K <- DEtimeKernCompute(kern, x)} computes a DEtime kernel matrix given an input data matrix.
-#'    \code{K <- DEtimeKernCompute(kern, x1, x2)} computes a DEtime kernel matrix for the given kernel type given two input data matrices, one for the rows and one for the columns.
+#'    \code{K <- DEtimeMatern32KernCompute(kern, x)} computes a DEtime Matern32 kernel matrix given an input data matrix.
+#'    \code{K <- DEtimeMatern32KernCompute(kern, x1, x2)} computes a DEtime Matern32 kernel matrix for the given kernel type given two input data matrices, one for the rows and one for the columns.
 #' @examples
 #' kern <- list()
 #' kern <- DEtimeKernParamInit(kern)
-#' K <- DEtimeKernCompute(kern, as.matrix(3:8))
+#' K <- DEtimeMatern32KernCompute(kern, as.matrix(3:8))
 
 
-DEtimeKernCompute <-
+DEtimeMatern32KernCompute <-
 function (kern, x, x2) {  
   xp <- kern$xp
   if (dim(x)[1]==1){ x<-t(x)} 
@@ -28,10 +28,9 @@ function (kern, x, x2) {
 
   if ( nargs() < 3 ) {
     replicate_no2 <- replicate_no
-    n2 <- .dist2(x0,x0)
-    m21 <- .dist2(x0,xp)
-    m22 <- .dist2(xp,x0)
-    
+    n2 <- .absolutedist(x0,x0)
+    m21 <- .absolutedist(x0,xp)
+    m22 <- .absolutedist(xp,x0)
     l2 <- l
     if (xp>=max(x0)) { 
       pos1 <- length(x0)}
@@ -50,9 +49,9 @@ function (kern, x, x2) {
     sorted_x <- sort(c(x0,x1),index.return=TRUE)
     xnew <- sorted_x$x
     ind <- sorted_x$ix
-    n2 <- .dist2(xnew,xnew)
-    m21 <- .dist2(xnew,xp)
-    m22 <- .dist2(xp,xnew)
+    n2 <- .absolutedist(xnew,xnew)
+    m21 <- .absolutedist(xnew,xp)
+    m22 <- .absolutedist(xp,xnew)
     if (xp >= max(xnew)) { pos1 <- length(xnew)}
     else {
     pos1 <- max(min(which((xnew<=xp)==FALSE))-1)}
@@ -61,18 +60,20 @@ function (kern, x, x2) {
   }
   
   wi2 <- 0.5*kern$inverseWidth
+  tmp1 <- sqrt(3)*kern$inverseWidth*n2
+  tmp2 <- sqrt(3)*kern$inverseWidth*m21
+  tmp3 <- sqrt(3)*kern$inverseWidth*m22
   k0 <- matrix(, nrow = 2*l, ncol= 2*l2)
   
   
   if (flag){
     
     k_0 <- matrix(, nrow = 2*l, ncol= 2*l2)
-    k_0[1:l,1:l2] <- kern$variance*exp(-n2*wi2)
+    k_0[1:l,1:l2] <- kern$variance*(1+tmp1)*exp(-tmp1)
     k_0[(l+1):(2*l),(l2+1):(2*l2)] <- k_0[1:l,1:l2]
-    k_0[1:l,(l2+1):(2*l2)] <- kern$variance*exp(-wi2*m21)%*%exp(-wi2*m22)
+    k_0[1:l,(l2+1):(2*l2)] <- (kern$variance*(1+tmp2)*exp(-tmp2))%*%((1+tmp3)*exp(-tmp3))
     k_0[(l+1):(2*l),1:l2] <- k_0[1:l,(l2+1):(2*l2)]
-    
-    #browser()  
+      
     k0 <- k_0
     if ((pos1 > 0) & (xp>0)) {
     
@@ -88,10 +89,13 @@ function (kern, x, x2) {
     
     l0 <- l+l2
     k_0 <- matrix(, nrow = 2*l0, ncol= 2*l0)
-    k_0[1:l0,1:l0] <- kern$variance*exp(-n2*wi2)
+    k_0[1:l0,1:l0] <- kern$variance*(1+tmp1)*exp(-tmp1)
     k_0[(l0+1):(2*l0),(l0+1):(2*l0)] <- k_0[1:l0,1:l0]
-    k_0[1:l0,(l0+1):(2*l0)] <- kern$variance*exp(-wi2*m21)%*%exp(-wi2*m22)
-    k_0[(l0+1):(2*l0),1:l0] <- kern$variance*t(exp(-wi2*m22))%*%t(exp(-wi2*m21))
+    k_0[1:l0,(l0+1):(2*l0)] <- (kern$variance*(1+tmp2)*exp(-tmp2))%*%((1+tmp3)*exp(-tmp3))
+
+    #k_0[1:l0,(l0+1):(2*l0)] <- exp(-wi2*m21)%*%exp(-wi2*m22)/kern$variance
+    #k_0[(l0+1):(2*l0),1:l0] <- t(exp(-wi2*m22))%*%t(exp(-wi2*m21))/kern$variance
+    k_0[(l0+1):(2*l0),1:l0] <- (kern$variance*t((1+tmp3)*exp(-tmp3)))%*%t((1+tmp2)*exp(-tmp2))
     
     k_1 <- k_0
     if ((pos1 > 0) & (xp>0)) {

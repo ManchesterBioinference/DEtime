@@ -1,21 +1,21 @@
-#' @title Compute the DEtime kernel given the parameters and X
-#' @param kern DEtime kernel structure to be computed
+#' @title Compute the DEtime RBF kernel given the parameters and X
+#' @param kern DEtime RBF kernel structure to be computed
 #' @param x Depending on the number of inputs, x can be the input data matrix (rows are data points) to the kernel computation, or the first input matrix to the kernel computation (forms the rows of the kernel)
 #' @param x2 Second input matrix to the kernel computation (forms the columns of the kernel)
 #' @return 
-#'    DEtime kernel structure.
+#'    DEtime RBF kernel structure.
 #' @description
-#'    Compute the DEtime kernel given the parameters and X.
+#'    Compute the DEtime RBF kernel given the parameters and X.
 #' @details
-#'    \code{K <- DEtimeKernCompute(kern, x)} computes a DEtime kernel matrix given an input data matrix.
-#'    \code{K <- DEtimeKernCompute(kern, x1, x2)} computes a DEtime kernel matrix for the given kernel type given two input data matrices, one for the rows and one for the columns.
+#'    \code{K <- DEtimeRBFKernCompute(kern, x)} computes a DEtime RBF kernel matrix given an input data matrix.
+#'    \code{K <- DEtimeRBFKernCompute(kern, x1, x2)} computes a DEtime RBF kernel matrix for the given kernel type given two input data matrices, one for the rows and one for the columns.
 #' @examples
 #' kern <- list()
 #' kern <- DEtimeKernParamInit(kern)
-#' K <- DEtimeKernCompute(kern, as.matrix(3:8))
+#' K <- DEtimeRBFKernCompute(kern, as.matrix(3:8))
 
 
-DEtimeKernCompute <-
+DEtimeRBFKernCompute <-
 function (kern, x, x2) {  
   xp <- kern$xp
   if (dim(x)[1]==1){ x<-t(x)} 

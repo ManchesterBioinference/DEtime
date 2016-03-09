@@ -70,7 +70,7 @@ function (kern, x, x2, covGrad) {
   k_tmp[1:l,(l2+1):(2*l2)] <- dist2xxp1 %*% dist2xxp2
   k_tmp[(l+1):(2*l),1:l2] <- t(t(dist2xxp2) %*% t(dist2xxp1))
   
-  if (pos1>0 ) {
+  if ((pos1>0) & (xp>0)) {
      k_tmp[(l+1):(l+pos1),] <- k_tmp[1:pos1,]
      if (pos2 >0 ){
         k_tmp[,(l2+1):(l2+pos2)] <- k_tmp[,1:pos2]
