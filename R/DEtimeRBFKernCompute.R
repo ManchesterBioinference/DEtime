@@ -13,7 +13,7 @@
 #' kern <- list()
 #' kern <- DEtimeKernParamInit(kern)
 #' K <- DEtimeRBFKernCompute(kern, as.matrix(3:8))
-
+#' @export
 
 DEtimeRBFKernCompute <-
 function (kern, x, x2) {  

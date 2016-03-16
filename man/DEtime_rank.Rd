@@ -4,8 +4,8 @@
 \alias{DEtime_rank}
 \title{Calculating the log-likelihood ratio of the biological time course data}
 \usage{
-DEtime_rank(times, ControlData, PerturbedData, replicate_no, gene_no,
-  gene_ID = NULL, savefile = TRUE)
+DEtime_rank(times, ControlData, PerturbedData, gene_ID = NULL,
+  savefile = TRUE)
 }
 \arguments{
 \item{times}{Experimental time point at which time course biological data are measured}
@@ -13,10 +13,6 @@ DEtime_rank(times, ControlData, PerturbedData, replicate_no, gene_no,
 \item{ControlData}{Time course data measured under control condition}
 
 \item{PerturbedData}{Time course data measured under perturbed condition}
-
-\item{replicate_no}{The number of replicates used in the studied experiment}
-
-\item{gene_no}{The number of genes addressed in this study}
 
 \item{gene_ID}{ID of these genes addressed in this study}
 
@@ -35,7 +31,7 @@ Both control and perturbed data have to be measured at the same time points with
 ### import simulated data
 data(SimulatedData)
 ### calculating loglikelihood ratio
-res <- DEtime_rank(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
-            replicate_no=replicate_no, gene_no=gene_no, gene_ID=gene_ID)
+res <- DEtime_rank(times = times, ControlData = ControlData, 
+  PerturbedData=PerturbedData, gene_ID=gene_ID)
 }
 

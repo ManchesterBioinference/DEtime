@@ -13,8 +13,6 @@ In this experiment, the aim is to study the transcriptional change occuring in A
    \item times_test Predefined perturbation time points
    \item ControlData Time series data for perturbed condition 1
    \item PerturbedData Time series data for perturbed condition 2
-   \item replicate_no Number of replicates used in the simulation
-   \item gene_no Number of genes involved in the study
    \item gene_ID ID for studied genes
   }
 }

@@ -4,21 +4,19 @@
 \alias{DEtime_infer}
 \title{Inferring perturbation time point from biological time course data}
 \usage{
-DEtime_infer(times, ControlData, PerturbedData, gene_ID = NULL,
-  kernel = "DEtime")
+DEtime_infer(times, ControlData, PerturbedData, times_test = NULL,
+  gene_ID = NULL)
 }
 \arguments{
-\item{times}{Experimental time point at which time course biological data are measured}
+\item{times}{Experimental time point at which time course biological data are measured, they have to be repeated if there are replicated measurements}
 
 \item{ControlData}{Time course data measured under control condition}
 
 \item{PerturbedData}{Time course data measured under perturbed condition}
 
-\item{gene_ID}{ID of these genes addressed in this study}
-
-\item{kernel}{covariance kernel used in this study, default is DEtime kernel, which is based on RBF kernel, and you can also choose DEtimeMatern32 or DEtimeMatern12 which are based on Matern32 and Matern12, respectively}
-
 \item{times_test}{The predefined evenly spaced time points upon which perturbation will be evaluated}
+
+\item{gene_ID}{ID of these genes addressed in this study}
 }
 \value{
 The function will return a DEtimeOutput object which includes:
@@ -48,6 +46,7 @@ Both control and perturbed data have to be measured at the same time points with
 ### import simulated data
 data(SimulatedData)
 ### start perturbation time inference
-res <- DEtime_infer(times = times, ControlData = ControlData, PerturbedData=PerturbedData)
+res <- DEtime_infer(times = times, ControlData = ControlData, 
+PerturbedData=PerturbedData, times_test=times_test,gene_ID=gene_ID)
 }
 

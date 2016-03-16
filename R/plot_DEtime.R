@@ -3,15 +3,16 @@
 #' @param plot_gene_ID The gene_IDs of those genes whose GP regression and posterior distribution of the perturbation time points will be plotted. If not supplied, all the genes will be plotted.
 #' @return
 #'    A figure for each gene whhich illustrates the GP regression (lower panel) as well as posterior distribution of its perturbation points (upper panel).   
+#' @import gptk
 #' @description
 #'    This function plots the results returned from \code{\link{DEtime_infer}} function. The produced figures show the the posterior distribution of inferred perturbation time points on the upper panel and Gaussian Regression of the original data on the lower panel.
 #' @seealso \code{\link{DEtime_infer}} \code{\link{print_DEtime}}
 #' @examples
 #' data(SimulatedData)
-#' res <- DEtime_infer(times = times, ControlData = ControlData, PerturbedData=PerturbedData,
-#'        replicate_no=replicate_no, gene_no=gene_no, times_test=times_test, gene_ID=gene_ID)
+#' res <- DEtime_infer(times = times, ControlData = ControlData, 
+#' PerturbedData=PerturbedData, times_test=times_test, gene_ID=gene_ID)
 #' plot_DEtime(res,plot_gene_ID='gene1')
-
+#' @export
 plot_DEtime <-
 function(DEtimeOutput, plot_gene_ID=NULL){
 ## plot the results from DEtime.R function.

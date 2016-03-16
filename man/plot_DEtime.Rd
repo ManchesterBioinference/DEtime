@@ -19,8 +19,8 @@ This function plots the results returned from \code{\link{DEtime_infer}} functio
 }
 \examples{
 data(SimulatedData)
-res <- DEtime_infer(times = times, ControlData = ControlData, PerturbedData=PerturbedData,
-       replicate_no=replicate_no, gene_no=gene_no, times_test=times_test, gene_ID=gene_ID)
+res <- DEtime_infer(times = times, ControlData = ControlData, 
+PerturbedData=PerturbedData, times_test=times_test, gene_ID=gene_ID)
 plot_DEtime(res,plot_gene_ID='gene1')
 }
 \seealso{

@@ -7,10 +7,10 @@
 #' @seealso \code{\link{DEtime_infer}} \code{\link{plot_DEtime}}
 #' @examples
 #' data(SimulatedData)
-#' res <- DEtime_infer(times = times, ControlData = ControlData, PerturbedData=PerturbedData,
-#'        replicate_no=replicate_no, gene_no=gene_no, times_test=times_test, gene_ID=gene_ID)
+#' res <- DEtime_infer(times = times, ControlData = ControlData, 
+#' PerturbedData=PerturbedData,times_test=times_test, gene_ID=gene_ID)
 #' print_DEtime(res)
-
+#' @export
 
 print_DEtime <-
 function(DEtimeOutput){

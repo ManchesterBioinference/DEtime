@@ -6,7 +6,8 @@ Date: 2015-03-11
 Author: c(person("YANG","Jing", role =
     c("aut","cre","trl"), email = "ynnjing@gmail.com"))
 Imports:
-    spam,Matrix,gptk,fields
+    gptk
+VignetteBuilder: knitr
 Maintainer: Jing Yang <ynnjing@gmail.com>
 Description: The DEtimeExtension package implements a toolkit for identifying
     the perturbation time point for two time series profiles obtained under control

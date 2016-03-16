@@ -13,8 +13,6 @@ A simulated data contains two time-series, control and perturbed cases.
    \item times_test Predefined perturbation time points
    \item ControlData Time series data for control condition
    \item PerturbedData Time series data for perturbed condition
-   \item replicate_no Number of replicates used in the simulation
-   \item gene_no Number of genes involved in the study
    \item gene_ID ID for studied genes
   }
 }

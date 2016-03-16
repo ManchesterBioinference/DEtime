@@ -8,8 +8,6 @@
 #'    \item times_test Predefined perturbation time points
 #'    \item ControlData Time series data for perturbed condition 1
 #'    \item PerturbedData Time series data for perturbed condition 2
-#'    \item replicate_no Number of replicates used in the simulation
-#'    \item gene_no Number of genes involved in the study
 #'    \item gene_ID ID for studied genes
 #'   }
 #' @format A list which contains the time course data for 20 genes at time points [0, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 16, 17.5] hrs with 4 replicates at each time point 

@@ -16,7 +16,7 @@
 #' kern <- list()
 #' kern <- DEtimeKernParamInit(kern)
 #' g <- DEtimeKernGradient(kern, as.matrix(c(1, 4)), array(1, c(2, 2)))
-
+#' @export
 
 DEtimeKernGradient <-
 function (kern, x, x2, covGrad) {

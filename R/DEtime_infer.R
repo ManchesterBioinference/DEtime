@@ -1,11 +1,10 @@
 #' Inferring perturbation time point from biological time course data
 #'
-#' @param times Experimental time point at which time course biological data are measured
+#' @param times Experimental time point at which time course biological data are measured, they have to be repeated if there are replicated measurements
 #' @param ControlData Time course data measured under control condition
 #' @param PerturbedData Time course data measured under perturbed condition
 #' @param times_test The predefined evenly spaced time points upon which perturbation will be evaluated
 #' @param gene_ID ID of these genes addressed in this study
-#' @param kernel covariance kernel used in this study, default is DEtime kernel, which is based on RBF kernel, and you can also choose DEtimeMatern32 or DEtimeMatern12 which are based on Matern32 and Matern12, respectively 
 #' @return The function will return a DEtimeOutput object which includes:
 #' \enumerate{
 #'    \item result: the statistical estimation for the inferred perturbation time
@@ -30,17 +29,12 @@
 #' ### import simulated data
 #' data(SimulatedData)
 #' ### start perturbation time inference
-#' res <- DEtime_infer(times = times, ControlData = ControlData, PerturbedData=PerturbedData)
+#' res <- DEtime_infer(times = times, ControlData = ControlData, 
+#' PerturbedData=PerturbedData, times_test=times_test,gene_ID=gene_ID)
+#' @import gptk
+#' @export
 
-DEtime_infer <- function(times,ControlData,PerturbedData,gene_ID=NULL,kernel="DEtime") {
-
-## DEtime_infer fits a mixed GP model on two dataset composed of both control data and perturbed data which diverges at a single perturbation point. The two dataset before the presumed perturbation point are fitted with a single GP and after the perturbation point, they are fitted with two independent GPs. The posterior distribution of the tested perturbation points is then obtained from which all thesestatistical info, for example, the MEDIAN, MODE and 5-95 percentile of the distribution can be derived.      
-## ARG times: The time points of the measured data. At the moment, it is assumed the control and perturbed data are measured at exactly the same time points.
-## ARG times_test: The time points which will be tested for perturbation effects. The original time points will be used if it is not provided.
-## ARG ControlData : The control dataset used in the model, which is ordered by the first replicate for all time points then the second replicate for all time points and so on
-## ARG PerturbedData : The perturbed dataset used in the model, which is ordered by the first replicate for all time points then the second replicate for all time points and so on
-## COPYRIGHT: Jing Yang, 2015
-##
+DEtime_infer <- function(times,ControlData,PerturbedData,times_test=NULL, gene_ID=NULL) {
 
 if (is.null(times)) {
     stop("Time points for the measurements are not provided, pls provide times.")
@@ -51,36 +45,33 @@ if (is.null(times_test)) {
     dim(times_test) <- c(length(times_test),1)
 }
 
-if (is.null(ControlData)){
+ if (is.null(ControlData)){
     stop("Control data are not provided, pls provide ControlData.")
-}
+  }
+  else if ((length(ControlData)%%length(times))>0) {
+     stop("Dimension of the Control data is not correct.")
+  }
+  else if (is.null(dim(ControlData))) {
+    dim(ControlData) <- c(length(ControlData)%/%length(times), length(times))
+  }
+  else if (dim(ControlData)[2] != length(times)){
+    if(dim(ControlData)[1]==length(times)) { ControlData = t(ControlData)}}
+  
 
-if (is.null(PerturbedData)){
-    stop("Perturbed data are not provided, pls provide PerturbedData.")
-}
-
-if (is.null(dim(ControlData))){
-    ControlData <- array(ControlData)
-}
-
-if (is.null(dim(PerturbedData))){
-    PerturbedData <- array(PerturbedData)
-}
-
-if (dim(PerturbedData)[2]!=length(times)) {
-   if (dim(PerturbedData)[1]==length(times)) { PerturbedData = t(PerturbedData)}
-   else {
-   stop("Dimension of the perturbed data is not correct")
- }}
-
-if (dim(ControlData)[2]!=length(times)) {
-   if (dim(ControlData)[1]==length(times)) { ControlData = t(ControlData)}
-   else {
-   stop("Dimension of the control data is not correct")
- }}
+  if (is.null(PerturbedData)){
+    stop("Perturbed data are not provided, pls provide ControlData.")
+  }
+ else if ((length(PerturbedData)%%length(times))>0) {
+     stop("Dimension of the perturbed data is not correct.")
+  }
+  else if (is.null(dim(PerturbedData))) {
+    dim(PerturbedData) <- c(length(PerturbedData)%/%length(times), length(times))
+  }
+  else if (dim(PerturbedData)[2] != length(times)){
+    if(dim(PerturbedData)[1]==length(times)) { PerturbedData = t(PerturbedData)}}
 
 
-if ((is.null(dim(ControlData)))||(is.null(dim(PerturbedData)))||(!all.equal((dim(ControlData)),dim(PerturbedData)))){
+  if (!all.equal((dim(ControlData)),dim(PerturbedData))){
     stop("Dimension of the input data is not correct, please note ControlData and PerturbedData are both matrix and have to be in the same size.")
 }
 
@@ -96,8 +87,9 @@ if ((max(times_test)>max(times))||(min(times_test)<min(times))){
 gene_no <- dim(PerturbedData)[1]
 len_times <- length(times)
 len_test <- length(times_test)
-Data <- array(cbind(ControlData, PerturbedData),dim=c(gene_no,2*len_times))
-times_rep2 <- c(times, times)
+#Data <- array(cbind(ControlData, PerturbedData),dim=c(gene_no,2*len_times))
+Data <- array(cbind(PerturbedData,ControlData),dim=c(gene_no,2*len_times))
+times2 <- c(times, times)
 
 DEtimeOutput <- list()
 MAP_DEtime <- matrix(0,nrow=gene_no,ncol=1)
@@ -119,11 +111,11 @@ param <- rep(0, 5)  ## Hyperparameters
 ### Likelihood for each tested perturbation point of each gene
 likelihood <- rep(0, len_test) ##  the likelihood
 
-x <- matrix(times_rep2, ncol=1)
+x <- matrix(times2, ncol=1)
 y <- matrix(scale((Data[idx,]),center=TRUE,scale=TRUE), ncol=1)
 
 options=gpOptions(approx="ftc")
-options$kern = list(type="cmpnd",comp=list(list(type=kernel,options=list(inverseWidthBounds=c(1/(2*max(times)),1/(min(times)+0.25*(max(times)-min(times)))),varianceBounds=c(max(min(y),0.5),max(max(y),5)))),list(type="white")))
+options$kern = list(type="cmpnd",comp=list(list(type="DEtime",options=list(inverseWidthBounds=c(1/(2*max(times)),1/(min(times)+0.25*(max(times)-min(times)))),varianceBounds=c(max(min(y),0.5),max(max(y),5)))),list(type="white")))
 #options$kern = list(type="cmpnd",comp=list(list(type="DEtime",list(type="white"))))
   if (sum(is.nan(y)) > (length(y)/2)) {
     cat('Majority of points in profile are NaN.\n')

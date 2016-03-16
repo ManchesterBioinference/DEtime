@@ -12,7 +12,7 @@
 #' kern <- DEtimeKernParamInit(kern)
 #' K <- DEtimeKernCompute(kern, as.matrix(3:8))
 #' Kd <- DEtimeKernDiagCompute(kern, as.matrix(3:8))
-
+#' @export
 
 DEtimeKernDiagCompute <-
 function (kern, x) {

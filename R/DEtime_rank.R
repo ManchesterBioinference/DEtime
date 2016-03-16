@@ -3,8 +3,6 @@
 #' @param times Experimental time point at which time course biological data are measured
 #' @param ControlData Time course data measured under control condition
 #' @param PerturbedData Time course data measured under perturbed condition
-#' @param replicate_no The number of replicates used in the studied experiment
-#' @param gene_no The number of genes addressed in this study
 #' @param gene_ID ID of these genes addressed in this study
 #' @param savefile A BOOLEAN argument which is used to indicate if the ranking list will be saved or not
 #' @return 
@@ -17,14 +15,15 @@
 #' ### import simulated data
 #' data(SimulatedData)
 #' ### calculating loglikelihood ratio
-#' res <- DEtime_rank(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
-#'             replicate_no=replicate_no, gene_no=gene_no, gene_ID=gene_ID)
+#' res <- DEtime_rank(times = times, ControlData = ControlData, 
+#'   PerturbedData=PerturbedData, gene_ID=gene_ID)
+#' @import gptk
+#' @export
 
-DEtime_rank <- function(times,ControlData,PerturbedData,replicate_no, gene_no,gene_ID=NULL, savefile=TRUE) {
+DEtime_rank <- function(times,ControlData,PerturbedData,gene_ID=NULL, savefile=TRUE) {
   
   ## DEtime fits a mixed GP model on two dataset composed of both control data and perturbed data which diverges at a single perturbation point. The two dataset before the presumed perturbation point are fitted with a single GP and after the perturbation point, they are fitted with two independent GPs. The posterior distribution of the tested perturbation points is then obtained from which all thesestatistical info, for example, the MEDIAN, MODE and 5-95 percentile of the distribution can be derived.      
   ## ARG times: The time points of the measured data. At the moment, it is assumed the control and perturbed data are measured at exactly the same time points.
-  ## ARG times_test: The time points which will be tested for perturbation effects. The original time points will be used if it is not provided.
   ## ARG replicate_no: The replicate nos of the meaured data. At the moment, same number of replicates are accepted for this model. If this is not provided, the value will be obtained by comparing the size of the measured data and the length of the time points
   ## ARG ControlData : The control dataset used in the model, which is ordered by the first replicate for all time points then the second replicate for all time points and so on
   ## ARG PerturbedData : The perturbed dataset used in the model, which is ordered by the first replicate for all time points then the second replicate for all time points and so on
@@ -32,54 +31,51 @@ DEtime_rank <- function(times,ControlData,PerturbedData,replicate_no, gene_no,ge
   ##
   
   
-  #pathnames <- list.files(pattern="[.]R$", path = "~/*.R", full.names = TRUE)
-  #sapply(pathnames,FUN=source)
   
   if (is.null(times)) {
     stop("Time points for the measurements are not provided, pls provide times.")
   }
   
-  if (is.null(replicate_no)){
-    stop("Replicate no for the measurements is not provided, pls provide replicate_no.")
-  }
-  
-  if (is.null(gene_no)){
-    stop("number of genes studies is not provided, pls provide gene_no.")
-  }
-  
   if (is.null(ControlData)){
     stop("Control data are not provided, pls provide ControlData.")
   }
-  else{
-    dim(ControlData) <- c(gene_no, length(times)*replicate_no)
+  else if ((length(ControlData)%%length(times))>0) {
+     stop("Dimension of the Control data is not correct.")
   }
+  else if (is.null(dim(ControlData))) {
+    dim(ControlData) <- c(length(ControlData)%/%length(times), length(times))
+  }
+  else if (dim(ControlData)[2] != length(times)){
+    if(dim(ControlData)[1]==length(times)) { ControlData = t(ControlData)}}
   
   if (is.null(PerturbedData)){
-    stop("Perturbed data are not provided, pls provide PerturbedData.")
+    stop("Perturbed data are not provided, pls provide ControlData.")
   }
-  else{
-    dim(PerturbedData) <- c(gene_no, length(times)*replicate_no)
+  else if ((length(PerturbedData)%%length(times))>0) {
+     stop("Dimension of the perturbed data is not correct.")
   }
+  else if (is.null(dim(PerturbedData))) {
+    dim(PerturbedData) <- c(length(PerturbedData)%/%length(times), length(times))
+  }
+  else if (dim(PerturbedData)[2] != length(times)){
+    if(dim(PerturbedData)[1]==length(times)) { PerturbedData = t(PerturbedData)}}
+ 
   
-  if ((is.null(dim(ControlData)))||(is.null(dim(ControlData)))||(!all.equal((dim(ControlData)),dim(PerturbedData)))){
+  if (!all.equal((dim(ControlData)),dim(PerturbedData))){
     stop("Dimension of the input data is not correct, please note ControlData and PerturbedData are both matrix and have to be in the same size.")
   }
   
   
   if (is.null(gene_ID)){
-    gene_ID <- as.character(seq(1,gene_no))
+    gene_ID <- as.character(seq(1,length(PerturbedData)%/%length(times)))
   }
-  
-  if (dim(ControlData)[2] != replicate_no*length(times) || (dim(ControlData)[1] != gene_no)){
-    browser()
-    stop("Dimension of the data doesn't match, pls double check ")
-  }
-  
   
   ### interpolation points
-  Data <- cbind(PerturbedData, ControlData)
-  times_rep2 <- rep(times, 2*replicate_no)
+  Data <- cbind(PerturbedData,ControlData)
+  times2 <- c(times, times)
   len_times <- length(times) 
+  gene_no <- dim(ControlData)[1]
+  dim(Data) <- c(gene_no, 2*len_times) 
   rank <- matrix(0,nrow=gene_no,ncol=1)
   
   #### model and parameters initialization
@@ -90,7 +86,7 @@ DEtime_rank <- function(times,ControlData,PerturbedData,replicate_no, gene_no,ge
     ### Likelihood for each tested perturbation point of each gene
     loglikelihood_minusinfty <- numeric(0) ##  the likelihood
     loglikelihood_infty <- numeric(0) ##  the likelihood
-    x <- matrix(times_rep2, ncol=1)
+    x <- matrix(times2, ncol=1)
     y <- matrix(scale((Data[idx,]),center=TRUE,scale=TRUE), ncol=1)
     
     options=gpOptions(approx="ftc")

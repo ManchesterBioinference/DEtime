@@ -14,6 +14,7 @@
 #' kern <- list()
 #' kern <- DEtimeKernParamInit(kern)
 #' params <- DEtimeKernExtractParam(kern)
+#' @export
 
 DEtimeKernExtractParam <-
 function (kern, only.values=TRUE,

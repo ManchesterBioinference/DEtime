@@ -9,6 +9,7 @@
 #' @examples
 #' kern <- list()
 #' K <- DEtimeKernParamInit(kern)
+#' @export
 
 DEtimeKernParamInit <-
 function (kern) {

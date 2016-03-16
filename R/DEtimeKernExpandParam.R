@@ -16,7 +16,7 @@
 #' ### the inverseWidth, variance and testing perturbation point for DEtime Kernel function
 #' params <- c(2, 1, 20)  
 #' Knew <- DEtimeKernExpandParam(K, params)
-
+#' @export
 DEtimeKernExpandParam <-
 function (kern, params) {
   if ( is.list(params) )
