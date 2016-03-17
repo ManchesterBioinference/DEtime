@@ -45,6 +45,25 @@ these two functions. For explanation of these arguments, please refer to the
 
 ## Examples
 
++ For straightforward perturbation time point inference without ranking, 
+
+```R
+library(DEtime)
+
+### inport simulated dataset
+data(SimulatedData)
+
+### go on with the perturbation time point inference
+res <- DEtime_infer(times = times, ControlData = ControlData, PerturbedData = PerturbedData)
+
+### Print a summary of the results
+print_DEtime(res)
+### plot results for all the genes
+plot_DEtime(res)
+}
+```
+
++ If ranking is needed, 
 ```R
 library(DEtime)
 
