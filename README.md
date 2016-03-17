@@ -52,7 +52,8 @@ library(DEtime)
 data(SimulatedData)
 
 ### calculating the loglikelihood ratio for these tested genes. the result is saved into DEtime_rank.txt
-res_rank <- DEtime_rank(times = times, ControlData = ControlData, PerturbedData=PerturbedData, gene_ID=gene_ID, savefile=TRUE)
+res_rank <- DEtime_rank(times = times, ControlData = ControlData, PerturbedData=PerturbedData, 
+          gene_ID=gene_ID, savefile=TRUE)
  
 ### get the index of these data with loglikelihood ratio larger than 4
 idx <- which(res_rank[,2]>4)
