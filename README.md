@@ -2,7 +2,7 @@
 DEtime is an R package for two-sample time series analysis using Gaussian process methods. 
 This package implements the Gaussian regression framework for perturbation time point inferrence in a two sample case. 
 
-The paper describing this package is available at arXiv: http://arxiv.org/abs/1602.01743 
+The paper describing this package is available at DOI: https://doi.org/10.1093/bioinformatics/btw329 and arXiv: http://arxiv.org/abs/1602.01743 
 
 ## Installation
 
@@ -80,10 +80,9 @@ idx <- which(res_rank[,2]>1)
 ### go on with the perturbation time inference if some of the data has passed the threshould test 
 if (length(idx)>0){
      res <- DEtime_infer(ControlTimes = ControlTimes, ControlData = ControlData[idx,], PerturbedTimes = PerturbedTimes, PerturbedData=PerturbedData[idx,])
-
-### Print a summary of the results
-print_DEtime(res)
-### plot results for all the genes
-plot_DEtime(res)
-}
+     ### Print a summary of the results
+     print_DEtime(res)
+     ### plot results for all the genes
+     plot_DEtime(res)
+  }
 ```
