@@ -2,7 +2,7 @@
 DEtime is an R package for two-sample time series analysis using Gaussian process methods. 
 This package implements the Gaussian regression framework for perturbation time point inferrence in a two sample case. 
 
-The paper describing this package is available at DOI: https://doi.org/10.1093/bioinformatics/btw329 and arXiv: http://arxiv.org/abs/1602.01743 
+The paper describing this package is available at DOI: https://doi.org/10.1093/bioinformatics/btw329 and arXiv: http://arxiv.org/abs/1602.01743. Please refer to the Jupyter notebook [**DEtime_illustration.ipynb**](https://github.com/ManchesterBioinference/DEtime/blob/master/DEtime_illustration.ipynb) for R codes about how to run the package.
 
 ## Installation
 
