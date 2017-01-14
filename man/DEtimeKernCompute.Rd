@@ -4,14 +4,14 @@
 \alias{DEtimeKernCompute}
 \title{Compute the DEtime kernel given the parameters and X}
 \usage{
-DEtimeKernCompute(kern, x, x2)
+DEtimeKernCompute(kern, X, X2)
 }
 \arguments{
 \item{kern}{DEtime kernel structure to be computed}
 
-\item{x}{Depending on the number of inputs, x can be the input data matrix (rows are data points) to the kernel computation, or the first input matrix to the kernel computation (forms the rows of the kernel)}
+\item{X}{A two-column matrix where the first column of this matrix is the time points for control and perturbed conditions and the second column uses '1' to represent time points from control condition and '2' to represent time points from perturbed condition}
 
-\item{x2}{Second input matrix to the kernel computation (forms the columns of the kernel)}
+\item{X2}{Second input matrix to the kernel computation (forms the columns of the kernel)}
 }
 \value{
 DEtime kernel structure.
@@ -20,12 +20,13 @@ DEtime kernel structure.
 Compute the DEtime kernel given the parameters and X.
 }
 \details{
-\code{K <- DEtimeKernCompute(kern, x)} computes a DEtime kernel matrix given an input data matrix.
-   \code{K <- DEtimeKernCompute(kern, x1, x2)} computes a DEtime kernel matrix for the given kernel type given two input data matrices, one for the rows and one for the columns.
+\code{K <- DEtimeKernCompute(kern, X)} computes a DEtime kernel matrix given an input data matrix.
+   \code{K <- DEtimeKernCompute(kern, X, X2)} computes a DEtime kernel matrix for the given kernel type given two input data matrices, one for the rows and one for the columns.
 }
 \examples{
 kern <- list()
 kern <- DEtimeKernParamInit(kern)
-K <- DEtimeKernCompute(kern, as.matrix(3:8))
+X <- matrix(c(seq(0,4),seq(0,4), rep(1,5),rep(2,5)),ncol=2)
+K <- DEtimeKernCompute(kern, X)
 }
 

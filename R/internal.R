@@ -1,26 +1,20 @@
 #### internal files used in DEtime package
 
 .gpPlot_DEtime <-
-function(model,Xstar,mu,S,likelihood,simpose=NULL,xlim=NULL,ylim=NULL,xlab='',ylab='',col='blue',title='') {
+function(model,Xstar,ControlTimes, ControlData, PerturbedTimes, PerturbedData, mu,S,likelihood,simpose=NULL,xlim=NULL,ylim=NULL,xlab='',ylab='',col='blue',title='') {
     ## GPPLOT Plots the GP mean and variance.
     
-    if (missing(model) || missing(Xstar)) {
-        stop('Missing GP model or points of prediction Xstar.')
-    } else {
-        if (missing(mu) || missing(S)) {
-            meanVar = gpPosteriorMeanVar(model, Xstar, varsigma.return=TRUE)
-            mu = meanVar$mu; S = meanVar$varsigma
-        }
-    }
+    len_control <- length(ControlTimes)
+    len_perturbed <- length(PerturbedTimes)
+    len_all <- len_control + len_perturbed
     
     lstar <- dim(Xstar)[1]/2
-    l <- dim(model$X)[1]/2
     #f = c(mu+2*sqrt(abs(S)), rev(mu-2*sqrt(abs(S))))
     f1  = c(mu[1:lstar]+2*sqrt(abs(S[1:lstar])), rev(mu[1:lstar]-2*sqrt(abs(S[1:lstar]))))
     f2 = c(mu[(lstar+1):(2*lstar)]+2*sqrt(abs(S[(lstar+1):(2*lstar)])), rev(mu[(lstar+1):(2*lstar)]-2*sqrt(abs(S[(lstar+1):(2*lstar)]))))
     
     if (is.null(xlim))
-    xlim = range((model$X))
+    xlim = range((model$X[,1]))
     if (is.null(ylim))
     ylim = range(c(f1,f2))
     
@@ -33,7 +27,8 @@ function(model,Xstar,mu,S,likelihood,simpose=NULL,xlim=NULL,ylim=NULL,xlab='',yl
     plot(likelihood, type="n", xaxt="n", yaxt="n", xlim=xlim, bty="l")
     xx <- c(likelihood[,1],rev(likelihood[,1]))
     yy <- c(rep(0,nrow(likelihood)), rev(likelihood[,2]))
-    polygon(xx,yy, col=rgb(0,0,1,0.4), border=NA, ylim=range(xx))
+    polygon(xx,yy, col=rgb(0,0,1,0.4), border=NA, xlim=range(xx), ylim=range(yy))
+    #polygon(xx,yy, col=rgb(0,0,1,0.4))
     par(fig=c(0.1,1.0,0.1,0.8), mar=c(2.0,2.0,0.0,2.0),new=TRUE)
     plot(1, type="n", xlim=xlim, ylim=ylim, cex.axis=.5,cex.lab=.5, cex.main=.5, cex.sub = .5, bty="l") ## Empty plot basis.
     
@@ -42,26 +37,22 @@ function(model,Xstar,mu,S,likelihood,simpose=NULL,xlim=NULL,ylim=NULL,xlab='',yl
     else shade = 'gray'
     
     lstar <- dim(Xstar)[1]/2
-    l <- dim(model$X)[1]/2
     
-    replicate_no <- length(which(model$X==model$X[1]))/2
-    size_x <- length(model$X)/(2*replicate_no)
-    mu_f <- matrix(0,nrow = size_x, ncol =1)
-    mu_g <- matrix(0,nrow = size_x, ncol =1)
+    mu_f <- matrix(0,nrow = len_control, ncol =1)
+    mu_g <- matrix(0,nrow = len_perturbed, ncol =1)
     
-    for (i in seq(replicate_no)){
-        mu_f <- mu_f + model$y[((i-1)*size_x+1):(i*size_x)]
-        mu_g <- mu_g + model$y[((i-1)*size_x+1+replicate_no*size_x):(i*size_x+replicate_no*size_x)]
-    }
-    mu_f <- mu_f/replicate_no
-    mu_g <- mu_g/replicate_no
-    
-    polygon(c(Xstar[1:lstar,], rev(Xstar[1:lstar,])), f1, col = rgb(0.9,1.0,1.0,1.0), border = shade)   ## Confidence intervals.
-    polygon(c(Xstar[(lstar+1):(2*lstar),], rev(Xstar[(lstar+1):(2*lstar),])), f2, col = rgb(1,0.95,0.7,.8), border = shade) ## Confidence intervals.
-    points(model$X[1:l,], model$y[1:l,], pch = 0, cex = .5, lwd=.5, col = 'blue')   ## Training points.
-    points(model$X[(l+1):(2*l),], model$y[(l+1):(2*l),], pch = 4, cex = .5, lwd=.5, col = 'red')    ## Training points.
-    lines(Xstar[1:lstar,], mu[1:lstar,], col='blue', lwd=.5, lty = 1)   ## Mean function.
-    lines(Xstar[(lstar+1):(2*lstar),], mu[(lstar+1):(2*lstar),], col='red', lwd=.5, lty = 1)    ## Mean function.
+
+    #mu_f <- aggregate(model$y[1:len_control], by=list(model$X[1:len_control,1]), FUN=mean)[2]    
+    #mu_g <- aggregate(model$y[(len_control+1):len_all], by=list(model$X[(len_control+1):len_all,1]), FUN=mean)[2]    
+
+    polygon(c(Xstar[1:lstar,1], rev(Xstar[1:lstar,1])), f1, col = rgb(0.9,1.0,1.0,1.0), border = shade)   ## Confidence intervals.
+    polygon(c(Xstar[(lstar+1):(2*lstar),1], rev(Xstar[(lstar+1):(2*lstar),1])), f2, col = rgb(1,0.95,0.7,.8), border = shade) ## Confidence intervals.
+    #points(model$X[1:len_control,1], model$y[1:len_control,], pch = 0, cex = .5, lwd=.5, col = 'blue')   ## Training points.
+    points(model$X[1:len_control,1], ControlData, pch = 0, cex = .5, lwd=.5, col = 'blue')   ## Training points.
+    #points(model$X[(len_control+1):(len_all),1], model$y[(len_control+1):(len_all),], pch = 4, cex = .5, lwd=.5, col = 'red')    ## Training points.
+    points(model$X[(len_control+1):(len_all),1], PerturbedData, pch = 4, cex = .5, lwd=.5, col = 'red')    ## Training points.
+    lines(Xstar[1:lstar,1], mu[1:lstar,], col='blue', lwd=.5, lty = 1)   ## Mean function.
+    lines(Xstar[(lstar+1):(2*lstar),1], mu[(lstar+1):(2*lstar),], col='red', lwd=.5, lty = 1)    ## Mean function.
     #lines(model$X[1:size_x,], mu_f[1:size_x,], col='black', lwd=.5, lty = 2)  ## Mean function
     #lines(model$X[1:size_x,], mu_g[1:size_x,], col='blue', lwd=.5, lty = 2)  ## Mean function .
     #par(mar=c(0, 0, 0, 0))
@@ -69,7 +60,7 @@ function(model,Xstar,mu,S,likelihood,simpose=NULL,xlim=NULL,ylim=NULL,xlab='',yl
     
     legend("bottom", c("Original control", "Original perturbed", "Estimated control", "Estimated perturbed"), col = c('blue', 'red','blue','red'),text.col = "black", lty = c(NA,NA,1,1), pch = c(0,4, NA,NA), bg = "gray90", ncol=3,bty="n", cex=0.8)
     
-    mtext(title, side=3, line=3, cex=1, col="black")
+    mtext(title, side=3, line=5, cex=1, col="black")
     mtext("Gene expression", side=2, line=2, padj=0.5, cex=1, col="black")
     mtext("Time", side=1, line=2, cex=1, col="black")
     if (!is.null(simpose)) {

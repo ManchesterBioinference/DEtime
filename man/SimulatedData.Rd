@@ -3,17 +3,16 @@
 \name{SimulatedData}
 \alias{SimulatedData}
 \title{Simulated time-series data used for testing}
-\format{A list which contains simulated time course data for 3 genes at 21 time points from 0 hrs to 20 hrs with 2 replicates at each time point}
+\format{A list which contains simulated time course data for 5 genes.}
 \description{
 A simulated data contains two time-series, control and perturbed cases.
 }
 \details{
 \itemize{
-   \item times Simulated exprimental times
-   \item times_test Predefined perturbation time points
-   \item ControlData Time series data for control condition
-   \item PerturbedData Time series data for perturbed condition
-   \item gene_ID ID for studied genes
+   \item ControlTimes Exprimental times for simulated control condition
+   \item ControlData Time series data for simulated control condition
+   \item PerturbedTimes Exprimental times for simulated perturbed condition
+   \item PerturbedData Time series data for simulated perturbed condition
   }
 }
 \examples{

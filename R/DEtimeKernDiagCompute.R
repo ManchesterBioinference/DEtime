@@ -1,38 +1,27 @@
 #' @title Retrieve the diagonal of the DEtime kernel
 #' @param kern DEtime kernel structure to be computed
-#' @param x Depending on the number of inputs, x can be the input data matrix (rows are data points) to the kernel computation, or the first input matrix to the kernel computation (forms the rows of the kernel)
+#' @param X A two-column matrix where the first column of this matrix is the time points for control and perturbed conditions and the second column uses '1' to represent time points from control condition and '2' to represent time points from perturbed condition
 #' @return 
 #'    Kd Vector containing computed diagonal elements of the kernel structure
 #' @details
-#'    \code{Kd <- DEtimekernDiagCompute(kern, x)} computes the diagonal of a DEtime kernel matrix for the given kernel.
+#'    \code{Kd <- DEtimekernDiagCompute(kern, X)} computes the diagonal of a DEtime kernel matrix for the given kernel.
 #' @description
 #'    Retrieve the diagonal of the DEtime kernel matrix.
 #' @examples
 #' kern <- list()
 #' kern <- DEtimeKernParamInit(kern)
-#' K <- DEtimeKernCompute(kern, as.matrix(3:8))
-#' Kd <- DEtimeKernDiagCompute(kern, as.matrix(3:8))
+#' X <- matrix(c(seq(3:8),seq(4:8),rep(1,6),rep(2,5)),ncol=2)
+#' Kd <- DEtimeKernDiagCompute(kern, X)
 #' @export
 
 DEtimeKernDiagCompute <-
-function (kern, x) {
+function (kern, X) {
   #k <- diag(DEtimeKernCompute(kern,x))
-  k <- matrix(kern$variance, dim(as.array(x))[1], 1)
+  Kd <- matrix(kern$variance, dim(X)[1], 1)
   
   if ("isNormalised" %in% names(kern) && kern$isNormalised)
-    k <- k * sqrt(kern$inverseWidth/(2*pi))
+    Kd <- Kd * sqrt(kern$inverseWidth/(2*pi))
 
-  return (k)
-}
-DEtimeKernExpandParam <-
-function (kern, params) {
-  if ( is.list(params) )
-    params <- params$values
-
-  kern$inverseWidth <- params[1]	## linear domain params, i.e. untransformed inverse-width and signal variance
-  kern$variance <- params[2]
-  kern$xp <- params[3]
-  
-  return (kern)
+  return (Kd)
 }
 

@@ -1,81 +1,104 @@
 #' @title Calculating the log-likelihood ratio of the biological time course data
 #'
-#' @param times Experimental time point at which time course biological data are measured
+#' @param ControlTimes Experimental time point at which time course biological data for the control case are measured, they have to be repeated if there are replicated measurements
 #' @param ControlData Time course data measured under control condition
+#' @param PerturbedTimes Experimental time point at which time course biological data for the perturbed case are measured, they have to be repeated if there are replicated measurements
 #' @param PerturbedData Time course data measured under perturbed condition
 #' @param gene_ID ID of these genes addressed in this study
+#' @param bound.lengthscale bounds for the lengthscale used in the DEtime RBF kernel. When not provided,bound.lengthscale <- c(max(diff(c(ControlTimes,PerturbedTimes))), 4*max(c(ControlTimes,PerturbedTimes)))
 #' @param savefile A BOOLEAN argument which is used to indicate if the ranking list will be saved or not
 #' @return 
 #'   \code{DEtime_rank} returns a dataframe object whose first column is the gene_ID and second column is the Loglikelihood_ratio of the named gene.
 #' @description 
 #'   \code{DEtime_rank} intends to rank biological time course data measured under control and perturbed conditions. In the function, an independent GP model and a combined GP model are used to model the data separately, the difference between the log-likelihood is used as the rank factor for the dataset. A high rank factor normally indicates better differential expression.
 #' @details
-#'    Both control and perturbed data have to be measured at the same time points with the same number of replicates. Replicates are required to be obtained across all time points. ControlData and PerturbedData are two matrices where each row represents the time course data for one particular gene under either control or perturbed condition. The columns for both ControlData and  PerturbedData are ordered by the time sequencing followed by replicates.
+#' ControlTimes and PerturbedTimes can be ordered by either time series, for instance time1, time1, time2, time2, time3, time3 ... or replicate sequences, for instance: time1, time2, time3, time1, time2, time3. ControlData and PerturbedData are two matrices where each row represents the time course data for one particular gene under either control or perturbed condition. The orders of the ControlData and PeruturbedData have to match those of the ControlTimes and PerturbedTimes, respectively. 
 #' @examples
 #' ### import simulated data
 #' data(SimulatedData)
 #' ### calculating loglikelihood ratio
-#' res <- DEtime_rank(times = times, ControlData = ControlData, 
-#'   PerturbedData=PerturbedData, gene_ID=gene_ID)
+#' res <- DEtime_rank(ControlTimes = ControlTimes, ControlData = ControlData, 
+#'        PerturbedTimes = PerturbedTimes,PerturbedData=PerturbedData)
 #' @import gptk
+#' @import stats
+#' @import utils
 #' @export
 
-DEtime_rank <- function(times,ControlData,PerturbedData,gene_ID=NULL, savefile=TRUE) {
+DEtime_rank <- function(ControlTimes,ControlData,PerturbedTimes,PerturbedData,gene_ID=NULL, bound.lengthscale=NULL, savefile=TRUE) {
   
   ## DEtime fits a mixed GP model on two dataset composed of both control data and perturbed data which diverges at a single perturbation point. The two dataset before the presumed perturbation point are fitted with a single GP and after the perturbation point, they are fitted with two independent GPs. The posterior distribution of the tested perturbation points is then obtained from which all thesestatistical info, for example, the MEDIAN, MODE and 5-95 percentile of the distribution can be derived.      
-  ## ARG times: The time points of the measured data. At the moment, it is assumed the control and perturbed data are measured at exactly the same time points.
-  ## ARG replicate_no: The replicate nos of the meaured data. At the moment, same number of replicates are accepted for this model. If this is not provided, the value will be obtained by comparing the size of the measured data and the length of the time points
-  ## ARG ControlData : The control dataset used in the model, which is ordered by the first replicate for all time points then the second replicate for all time points and so on
-  ## ARG PerturbedData : The perturbed dataset used in the model, which is ordered by the first replicate for all time points then the second replicate for all time points and so on
+  ## ARG ControlTimes: The time points of the measured data under control condition. This does not have to be the same as the time points for perturbed condition
+  ## ARG ControlData : The control dataset used in the model, which is the matched measurements at corresponding control time points
+  ## ARG PerturbedTimes: The time points of the measured data under perturbed condition. This does not have to be the same as the time points for control condition
+  ## ARG PerturbedData : The perturbed dataset used in the model, which is the matched measurements at corresponding perturbed time points
   ## COPYRIGHT: Jing Yang, 2015
   ##
   
-  
-  
-  if (is.null(times)) {
-    stop("Time points for the measurements are not provided, pls provide times.")
+if (is.null(ControlTimes)) {
+    stop("Time points for the control measurements are not provided, pls provide times.")
+}
+
+if (is.null(PerturbedTimes)) {
+    stop("Time points for the perturbed measurements are not provided, pls provide times.")
+}
+
+if (is.null(ControlData)){
+    stop("ControlData are not provided, pls provide controlData.")
   }
-  
-  if (is.null(ControlData)){
-    stop("Control data are not provided, pls provide ControlData.")
-  }
-  else if ((length(ControlData)%%length(times))>0) {
-     stop("Dimension of the Control data is not correct.")
+  else if ((length(ControlData)%%length(ControlTimes))>0) {
+     stop("Dimension of the ControlData is not correct.")
   }
   else if (is.null(dim(ControlData))) {
-    dim(ControlData) <- c(length(ControlData)%/%length(times), length(times))
+    dim(ControlData) <- c(length(ControlData)%/%length(ControlTimes), length(ControlTimes))
   }
-  else if (dim(ControlData)[2] != length(times)){
-    if(dim(ControlData)[1]==length(times)) { ControlData = t(ControlData)}}
-  
+  else if (dim(ControlData)[2] != length(ControlTimes)){
+ if(dim(ControlData)[1]==length(ControlTimes)) {
+     warning("ControlData is in the wrong dimension, it is transposed now.")
+     ControlData = t(ControlData)}
+  }
+ else{
+  print("ControlData is accepted")}
+
+
   if (is.null(PerturbedData)){
-    stop("Perturbed data are not provided, pls provide ControlData.")
+    stop("PerturbedData are not provided, pls provide PerturbedData.")
   }
-  else if ((length(PerturbedData)%%length(times))>0) {
-     stop("Dimension of the perturbed data is not correct.")
+ else if ((length(PerturbedData)%%length(PerturbedTimes))>0) {
+     stop("Dimension of the PerturbedData is not correct.")
   }
   else if (is.null(dim(PerturbedData))) {
-    dim(PerturbedData) <- c(length(PerturbedData)%/%length(times), length(times))
+    dim(PerturbedData) <- c(length(PerturbedData)%/%length(PerturbedTimes), length(PerturbedTimes))
   }
-  else if (dim(PerturbedData)[2] != length(times)){
-    if(dim(PerturbedData)[1]==length(times)) { PerturbedData = t(PerturbedData)}}
- 
-  
-  if (!all.equal((dim(ControlData)),dim(PerturbedData))){
-    stop("Dimension of the input data is not correct, please note ControlData and PerturbedData are both matrix and have to be in the same size.")
-  }
-  
-  
-  if (is.null(gene_ID)){
-    gene_ID <- as.character(seq(1,length(PerturbedData)%/%length(times)))
-  }
-  
-  ### interpolation points
-  Data <- cbind(PerturbedData,ControlData)
-  times2 <- c(times, times)
-  len_times <- length(times) 
+  else if (dim(PerturbedData)[2] != length(PerturbedTimes)){
+    if(dim(PerturbedData)[1]==length(PerturbedTimes)) {
+    warning("PerturbedData is in the wrong dimension, it is transposed now.")
+    PerturbedData = t(PerturbedData)}}
+ else{
+ print("PerturbedData is accepted")}
+
+if (is.null(gene_ID)){
+    print("gene IDs are not provided. Numbers are used instead")
+    gene_ID <- as.character(seq(1,dim(ControlData)[1]))
+}
+  else if(length(gene_ID)<dim(ControlData)[1]){
+    warning("Insufficient gene IDs are provided, numbers are used for remainning ones")
+    gene_ID <- c(gene_ID, as.character(seq(length(gene_ID)+1,dim(ControlData)[1])))
+}
+
+times <- matrix(c(ControlTimes,PerturbedTimes),ncol=1)
+
+if ((max(ControlTimes)<min(PerturbedTimes)) || (min(ControlTimes>max(PerturbedTimes)))){
+  stop("There are no intersection between the ControlData and the PerturbedData. The program has to be stopped here")
+}
+if (is.null(bound.lengthscale)){
+    bound.lengthscale <- c(max(diff(times)),4*max(times))
+}
+
   gene_no <- dim(ControlData)[1]
-  dim(Data) <- c(gene_no, 2*len_times) 
+  Data <- matrix(c(ControlData,PerturbedData),nrow=gene_no,ncol=dim(times)[1])
+
+  ### interpolation points
+  len_times <- length(times) 
   rank <- matrix(0,nrow=gene_no,ncol=1)
   
   #### model and parameters initialization
@@ -86,11 +109,12 @@ DEtime_rank <- function(times,ControlData,PerturbedData,gene_ID=NULL, savefile=T
     ### Likelihood for each tested perturbation point of each gene
     loglikelihood_minusinfty <- numeric(0) ##  the likelihood
     loglikelihood_infty <- numeric(0) ##  the likelihood
-    x <- matrix(times2, ncol=1)
+    x <- matrix(cbind(times,c(rep(1,length(ControlTimes)),rep(2,length(PerturbedTimes)))), ncol=2)
     y <- matrix(scale((Data[idx,]),center=TRUE,scale=TRUE), ncol=1)
     
     options=gpOptions(approx="ftc")
-    options$kern = list(type="cmpnd",comp=list(list(type="DEtime",options=list(inverseWidthBounds=c(1/(2*max(times)),1/(min(times)+0.25*(max(times)-min(times)))),varianceBounds=c(min(min(y),0.5),max(max(y),5)))),list(type="white")))
+    options$kern = list(type="cmpnd",comp=list(list(type="DEtime",options=list(inverseWidthBounds=1.0/bound.lengthscale)),list(type="white")))
+
     if (sum(is.nan(y)) > (length(y)/2)) {
       cat('Majority of points in profile are NaN.\n')
       next

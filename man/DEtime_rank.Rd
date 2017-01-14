@@ -4,17 +4,21 @@
 \alias{DEtime_rank}
 \title{Calculating the log-likelihood ratio of the biological time course data}
 \usage{
-DEtime_rank(times, ControlData, PerturbedData, gene_ID = NULL,
-  savefile = TRUE)
+DEtime_rank(ControlTimes, ControlData, PerturbedTimes, PerturbedData,
+  gene_ID = NULL, bound.lengthscale = NULL, savefile = TRUE)
 }
 \arguments{
-\item{times}{Experimental time point at which time course biological data are measured}
+\item{ControlTimes}{Experimental time point at which time course biological data for the control case are measured, they have to be repeated if there are replicated measurements}
 
 \item{ControlData}{Time course data measured under control condition}
+
+\item{PerturbedTimes}{Experimental time point at which time course biological data for the perturbed case are measured, they have to be repeated if there are replicated measurements}
 
 \item{PerturbedData}{Time course data measured under perturbed condition}
 
 \item{gene_ID}{ID of these genes addressed in this study}
+
+\item{bound.lengthscale}{bounds for the lengthscale used in the DEtime RBF kernel. When not provided,bound.lengthscale <- c(max(diff(c(ControlTimes,PerturbedTimes))), 4*max(c(ControlTimes,PerturbedTimes)))}
 
 \item{savefile}{A BOOLEAN argument which is used to indicate if the ranking list will be saved or not}
 }
@@ -25,13 +29,13 @@ DEtime_rank(times, ControlData, PerturbedData, gene_ID = NULL,
 \code{DEtime_rank} intends to rank biological time course data measured under control and perturbed conditions. In the function, an independent GP model and a combined GP model are used to model the data separately, the difference between the log-likelihood is used as the rank factor for the dataset. A high rank factor normally indicates better differential expression.
 }
 \details{
-Both control and perturbed data have to be measured at the same time points with the same number of replicates. Replicates are required to be obtained across all time points. ControlData and PerturbedData are two matrices where each row represents the time course data for one particular gene under either control or perturbed condition. The columns for both ControlData and  PerturbedData are ordered by the time sequencing followed by replicates.
+ControlTimes and PerturbedTimes can be ordered by either time series, for instance time1, time1, time2, time2, time3, time3 ... or replicate sequences, for instance: time1, time2, time3, time1, time2, time3. ControlData and PerturbedData are two matrices where each row represents the time course data for one particular gene under either control or perturbed condition. The orders of the ControlData and PeruturbedData have to match those of the ControlTimes and PerturbedTimes, respectively.
 }
 \examples{
 ### import simulated data
 data(SimulatedData)
 ### calculating loglikelihood ratio
-res <- DEtime_rank(times = times, ControlData = ControlData, 
-  PerturbedData=PerturbedData, gene_ID=gene_ID)
+res <- DEtime_rank(ControlTimes = ControlTimes, ControlData = ControlData, 
+       PerturbedTimes = PerturbedTimes,PerturbedData=PerturbedData)
 }
 

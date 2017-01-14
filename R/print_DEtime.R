@@ -7,8 +7,8 @@
 #' @seealso \code{\link{DEtime_infer}} \code{\link{plot_DEtime}}
 #' @examples
 #' data(SimulatedData)
-#' res <- DEtime_infer(times = times, ControlData = ControlData, 
-#' PerturbedData=PerturbedData,times_test=times_test, gene_ID=gene_ID)
+#' res <- DEtime_infer(ControlTimes = ControlTimes, ControlData = ControlData, 
+#' PerturbedTimes = PerturbedTimes, PerturbedData = PerturbedData)
 #' print_DEtime(res)
 #' @export
 
@@ -18,10 +18,10 @@ function(DEtimeOutput){
 ## ARG DEtimeOutput: the output from DEtime.R function
 
   cat('Perturbation point inference results from DEtime package: \n')
-  cat('=======================================\n')
+  cat('==========================================================\n')
   
-  print(DEtimeOutput$result, zero.print = ".")
-  cat('=======================================\n')
+  print(DEtimeOutput$result, sep="\t", zero.print = ".")
+  cat('==========================================================\n')
   
   #cat('MAP of the perturbation point: ', DEtimeOutput$MAP, '\n')
   #cat('Mean of the perturbation point: ', DEtimeOutput$mean, '\n')

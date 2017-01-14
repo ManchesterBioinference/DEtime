@@ -17,8 +17,8 @@ The function prints the results returned from \code{\link{DEtime_infer}} functio
 }
 \examples{
 data(SimulatedData)
-res <- DEtime_infer(times = times, ControlData = ControlData, 
-PerturbedData=PerturbedData,times_test=times_test, gene_ID=gene_ID)
+res <- DEtime_infer(ControlTimes = ControlTimes, ControlData = ControlData, 
+PerturbedTimes = PerturbedTimes, PerturbedData = PerturbedData)
 print_DEtime(res)
 }
 \seealso{

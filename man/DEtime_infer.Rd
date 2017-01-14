@@ -4,19 +4,23 @@
 \alias{DEtime_infer}
 \title{Inferring perturbation time point from biological time course data}
 \usage{
-DEtime_infer(times, ControlData, PerturbedData, times_test = NULL,
-  gene_ID = NULL)
+DEtime_infer(ControlTimes, ControlData, PerturbedTimes, PerturbedData,
+  TestTimes = NULL, gene_ID = NULL, bound.lengthscale = NULL)
 }
 \arguments{
-\item{times}{Experimental time point at which time course biological data are measured, they have to be repeated if there are replicated measurements}
+\item{ControlTimes}{Experimental time point at which time course biological data for the control case are measured, they have to be repeated if there are replicated measurements}
 
 \item{ControlData}{Time course data measured under control condition}
 
+\item{PerturbedTimes}{Experimental time point at which time course biological data for the perturbed case are measured, they have to be repeated if there are replicated measurements}
+
 \item{PerturbedData}{Time course data measured under perturbed condition}
 
-\item{times_test}{The predefined evenly spaced time points upon which perturbation will be evaluated}
+\item{TestTimes}{The predefined evenly spaced time points upon which perturbation will be evaluated. If undefined, TestTimes <- seq(min(c(ControlTimes, PerturbedTimes)), max(c(ControlTimes, PerturbedTimes)),length=50)}
 
-\item{gene_ID}{ID of these genes addressed in this study}
+\item{gene_ID}{ID of these genes addressed in this study. If undefinied, numbers will be used instead}
+
+\item{bound.lengthscale}{bounds for the lengthscale used in the DEtime RBF kernel. When not provided,bound.lengthscale <- c(min(ControlTimes,PerturbedTimes), 4*max(c(ControlTimes,PerturbedTimes)))}
 }
 \value{
 The function will return a DEtimeOutput object which includes:
@@ -30,9 +34,11 @@ The function will return a DEtimeOutput object which includes:
    \item posterior: posterior distribution of the tested perturbation time points
    \item model: optimized GP model which will be used for later GP regression work
    \item best_param: optimized hyperparameter for the optimized GP model
-   \item originaltimes: original experimental time points which will be used for future print or plot functions
-   \item originaldata: original measured time course data which will be used for future print or plot functions
-   \item times_test: tested perturbation time points
+   \item ControlTimes: original experimental time points for the control case which will be used for future print or plot functions
+   \item ControlData: original measured time course data for the control case which will be used for future print or plot functions
+   \item PerturbedTimes: original experimental time points for the perturbed case which will be used for future print or plot functions
+   \item PerturbedData: original measured time course data for the control case which will be used for future print or plot functions
+   \item TestTimes: tested perturbation time points
    \item gene_ID: the ID of genes for the data
 }
 }
@@ -40,13 +46,13 @@ The function will return a DEtimeOutput object which includes:
 This is the main function in DEtime Package, which applies a mixedGP kernel to time course data under control and perturbed conditions. It returns the posterior distribution of these predefined perturbation time candidates and relevant statistical estimations of the inferred perturbation time point.
 }
 \details{
-Both control and perturbed data have to be measured at the same time points with the same number of replicates. Replicates are required to be obtained across all time points. ControlData and PerturbedData are two matrices where each row represents the time course data for one particular gene under either control or perturbed condition. The columns for both ControlData and  PerturbedData are ordered by the time sequencing followed by replicates.
+ControlTimes and PerturbedTimes can be ordered by either time series, for instance time1, time1, time2, time2, time3, time3 ... or replicate sequences, for instance: time1, time2, time3, time1, time2, time3. ControlData and PerturbedData are two matrices where each row represents the time course data for one particular gene under either control or perturbed condition. The orders of the ControlData and PeruturbedData have to match those of the ControlTimes and PerturbedTimes, respectively.
 }
 \examples{
 ### import simulated data
 data(SimulatedData)
 ### start perturbation time inference
-res <- DEtime_infer(times = times, ControlData = ControlData, 
-PerturbedData=PerturbedData, times_test=times_test,gene_ID=gene_ID)
+res <- DEtime_infer(ControlTimes = ControlTimes, ControlData = ControlData, 
+PerturbedTimes = PerturbedTimes, PerturbedData = PerturbedData)
 }
 

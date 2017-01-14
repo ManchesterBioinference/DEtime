@@ -12,7 +12,8 @@
 #' @examples
 #' kern <- list()
 #' kern <- DEtimeKernParamInit(kern)
-#' K <- DEtimeKernCompute(kern, as.matrix(3:8))
+#' X <- matrix(c(seq(0,4),seq(0,4), rep(1,5),rep(2,5)),ncol=2)
+#' K <- DEtimeKernCompute(kern, X)
 #' ### the inverseWidth, variance and testing perturbation point for DEtime Kernel function
 #' params <- c(2, 1, 20)  
 #' Knew <- DEtimeKernExpandParam(K, params)

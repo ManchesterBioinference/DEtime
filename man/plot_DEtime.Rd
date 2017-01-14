@@ -4,10 +4,12 @@
 \alias{plot_DEtime}
 \title{Plot the results from DEtime function}
 \usage{
-plot_DEtime(DEtimeOutput, plot_gene_ID = NULL)
+plot_DEtime(DEtimeOutput, BestPerturbPos = NULL, plot_gene_ID = NULL)
 }
 \arguments{
 \item{DEtimeOutput}{The returned value from \code{\link{DEtime_infer}} function}
+
+\item{BestPerturbPos}{The statistical factor used for the optimal estimate to the perturbation point. You can choose "mean", "median" or "MAP". The corresponding statistical inference of the posterior distribution of the pertubation points will be adopted as the best estimate to the perturbation. "MAP" will be used if this parameter is not provided.}
 
 \item{plot_gene_ID}{The gene_IDs of those genes whose GP regression and posterior distribution of the perturbation time points will be plotted. If not supplied, all the genes will be plotted.}
 }
@@ -19,9 +21,9 @@ This function plots the results returned from \code{\link{DEtime_infer}} functio
 }
 \examples{
 data(SimulatedData)
-res <- DEtime_infer(times = times, ControlData = ControlData, 
-PerturbedData=PerturbedData, times_test=times_test, gene_ID=gene_ID)
-plot_DEtime(res,plot_gene_ID='gene1')
+res <- DEtime_infer(ControlTimes = ControlTimes, ControlData = ControlData, 
+       PerturbedTimes = PerturbedTimes, PerturbedData = PerturbedData)
+plot_DEtime(res,BestPerturbPos="mean", plot_gene_ID=c('1','2'))
 }
 \seealso{
 \code{\link{DEtime_infer}} \code{\link{print_DEtime}}

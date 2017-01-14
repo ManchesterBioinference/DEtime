@@ -1,98 +1,104 @@
 #' @title Compute the gradient with respect to the kernel parameters
 #' @param kern The DEtime kernel structure for which the gradients are being computed
-#' @param x When \code{x2} is provided, x is the input locations associated with the rows of the kernel matrix; when \code{x2} is missing, \code{x} is the input locations associated with both the rows and the columns of the kernel matrix
-#' @param x2 The input locations associated with the columnss of the kernel matrix
-#' @param covGrad A matrix of partial derivatives of the function of interest with respect to thekernel matrix. the matrix should have the same number of rows as x1 and the same number of columns as \code{x2} has rows   
+#' @param X When \code{X2} is provided, X is the input locations associated with the rows of the kernel matrix; when \code{X2} is missing, \code{X} is the input locations associated with both the rows and the columns of the kernel matrix
+#' @param X2 The input locations associated with the columnss of the kernel matrix
+#' @param covGrad A matrix of partial derivatives of the function of interest with respect to thekernel matrix. the matrix should have the same number of rows as X1 and the same number of columns as \code{X2} has rows   
 #' @return
 #'    g Gradients of the function of interest with respect to the kernel parameters. The ordering of the vector should match that provided by \code{\link{DEtimeKernExtractParam}}.
 #' @description
 #'    Compute the gradient with respect to the kernel parameters.
 #' @details
-#'    \code{g <- kernGradient(kern, x, covGrad)} computes the gradient of functions with respect to the kernel parameters. As well as the kernel structure and the input positions, the user provides a matrix covGrad which gives the partial derivatives of the function with respect to the relevant elements of the kernel matrix.
-#'     \code{g <- kernGradient(kern, x1, x2, covGrad)} computes the derivatives as above, but input locations are now provided in two matrices associated with rows and columns of the kernel matrix.
+#'    \code{g <- kernGradient(kern, X, covGrad)} computes the gradient of functions with respect to the kernel parameters. As well as the kernel structure and the input positions, the user provides a matrix covGrad which gives the partial derivatives of the function with respect to the relevant elements of the kernel matrix.
+#'     \code{g <- kernGradient(kern, X1, X2, covGrad)} computes the derivatives as above, but input locations are now provided in two matrices associated with rows and columns of the kernel matrix.
 #' @seealso
 #'     \code{\link{DEtimeKernCompute}}, \code{\link{DEtimeKernExtractParam}}
 #' @examples
 #' kern <- list()
 #' kern <- DEtimeKernParamInit(kern)
-#' g <- DEtimeKernGradient(kern, as.matrix(c(1, 4)), array(1, c(2, 2)))
+#' X <- matrix(c(seq(0,4),seq(0,4), rep(1,5),rep(2,5)),ncol=2)
+#' g <- DEtimeKernGradient(kern, X, array(1, c(10, 10)))
+#' @import AtmRay
 #' @export
 
 DEtimeKernGradient <-
-function (kern, x, x2, covGrad) {
+function (kern, X, X2, covGrad) {
   
-  if (dim(x)[1]==1){ x<-t(x)}
-  replicate_no <- length(which(x==x[1]))/2
-  if (replicate_no<1){
-      replicate_no <- 1
-  }
- 
-  l <- dim(x)[1]/(2*replicate_no)
   xp <- kern$xp
-  x0 <- x[1:l]
-  if ( nargs() == 3 ) {
-    replicate_no2 <- replicate_no
-    k <- DEtimeKernCompute(kern, x)
-    dist2xx <- .dist2(x0,x0)
-    dist2xxp1 <- .dist2(x0,xp)
-    dist2xxp2 <- .dist2(xp,x0)
-    l2 <- l
-    covGrad <- x2
-    if (xp >= max(x0)) { pos1 <- length(x0)}
-    else { pos1 <- max(min(which((x0<xp)==FALSE))-1, 0)}
-    pos2 <- pos1
-    flag <- FALSE      
-    
-  } else if (nargs() == 4) {
-    if (dim(x2)[1]==1){ x2<-t(x2)}
-    replicate_no2 <- length(which(x2==x2[1]))/2
-    if (replicate_no2<1){
-      replicate_no2 <- 1
-    }
-    k <- DEtimeKernCompute(kern, x, x2)
-    l2 <- dim(x2)[1]/(2*replicate_no2)
-    x1 <- x2[1:l2]
-    sorted_x <- sort(rbind(x0,x1),index.return=TRUE)
-    xnew <- sorted_x$x
-    ind <- sorted_x$ix
-    dist2xx <- .dist2(xnew,xnew)
-    dist2xxp1 <- .dist2(xnew,xp)
-    dist2xxp2 <- .dist2(xp,xnew)
-    if (xp >= max(xnew)) { pos1 <- length(xnew)}
-    else {pos1 <- max(min(which((xnew<xp)==FALSE))-1,0)}
-    pos2 <- pos1
-    flag <- TRUE
+  x <- matrix(X[,1],ncol=1)
+  lfx <- sum(X[,2]==1)
+  lx <- dim(x)[1]
+  lgx = lx-lfx
+  fx <- x[(1:lfx),]
+  gx <- x[-(1:lfx),]
+
+  if ( nargs()==3 ) {
+    ly <- lx
+    lfy <- lfx
+    lgy <- lgx
+    fy <- x[(1:lfy),]
+    gy <- x[-(1:lfy),]
+    covGrad <- X2
+    x2 <- x
+    X2 <- X
   }
-  
-  k_tmp <- matrix(0,nrow =(2*l),ncol=(2*l2))
-  k_tmp[1:l,1:l2] <- dist2xx
-  k_tmp[(l+1):(2*l),(l2+1):(2*l2)] <- dist2xx
-  k_tmp[1:l,(l2+1):(2*l2)] <- dist2xxp1 %*% dist2xxp2
-  k_tmp[(l+1):(2*l),1:l2] <- t(t(dist2xxp2) %*% t(dist2xxp1))
-  
-  if ((pos1>0) & (xp>0)) {
-     k_tmp[(l+1):(l+pos1),] <- k_tmp[1:pos1,]
-     if (pos2 >0 ){
-        k_tmp[,(l2+1):(l2+pos2)] <- k_tmp[,1:pos2]
-        k_tmp[(l+1):(l+pos1),(l2+1):(l2+pos2)] <- k_tmp[1:pos1,1:pos2]
-     }
+  if ( nargs()==4 ) {
+    x2 <- matrix(X2[,1],ncol=1)
+    ly <- dim(x2)[1]
+    lfy <- sum(X2[,2]==1)
+    lgy <- ly-lfy
+    fy <- x2[(1:lfy),]
+    gy <- x2[-(1:lfy),]
   }
+
+  k <- matrix(, nrow = lx, ncol= ly)
+  k <- DEtimeKernCompute(kern,X,X2)
+
+  k_a <- matrix(, nrow = lx, ncol= ly)
+  k00 <- matrix(, nrow = lfx, ncol= lfy)
+  k01 <- matrix(, nrow = lfx, ncol= lgy)
+  k10 <- matrix(, nrow = lgx, ncol= lfy)
+  k11 <- matrix(, nrow = lgx, ncol= lgy)
+
+  n2ff <- .dist2(fx,fy)
+  n2gg <- .dist2(gx,gy)
+  n2fg1 <- .dist2(fx,gy)
+  n2fg2 <- .dist2(gx,fy)
+
   
-  kr <- k_tmp
-  if (flag){
-  for (i in seq(2*l)){
-    for (j in seq(2*l2)){
-      kr[ind[i],ind[j]] <- k_tmp[i,j]
-    }
-  }
-  }
-  
-  k00 <- kr[rep(1:l,replicate_no), rep(1:l2,replicate_no2)]
-  k01 <- kr[rep(1:l,replicate_no), rep((l2+1):(2*l2),replicate_no2)]
-  k10 <- kr[rep((l+1):(2*l),replicate_no), rep(1:l2,replicate_no2)]
-  k11 <- kr[rep((l+1):(2*l),replicate_no), rep((l2+1):(2*l2),replicate_no2)]  
-  
-  
+  m2fxp <- .dist2(fx,xp)
+  m2fyp <- .dist2(fy,xp)
+  m2gxp <- .dist2(gx,xp)
+  m2gyp <- .dist2(gy,xp)
+
+  k00 <- n2ff
+  k11 <- m2gxp%*%t(m2gyp)
+  k01 <- m2fxp%*%t(m2gyp)
+  k10 <- m2gxp%*%t(m2fyp)
+ 
+  idx_gx <- which(gx<xp)
+  idx_gy <- which(gy<xp)
+
+  idx_gx1 <- which(gx>=xp)
+  idx_gy1 <- which(gy>=xp)
+
+  idx1 <- meshgrid(1:lfx,idx_gy)
+  idx2 <- meshgrid(idx_gx,1:lfy)
+  idx3 <- meshgrid(idx_gx,idx_gy)
+  idx4 <- meshgrid(idx_gx1,idx_gy1)
+
+
+  m_idx1 <- matrix(c(idx1$x,idx1$y),ncol=2)
+  m_idx2 <- matrix(c(idx2$x,idx2$y),ncol=2)
+  m_idx3 <- matrix(c(idx3$x,idx3$y),ncol=2)
+  m_idx4 <- matrix(c(idx4$x,idx4$y),ncol=2)
+
+  k01[m_idx1] <- n2fg1[m_idx1]
+  k10[m_idx2] <- n2fg2[m_idx2]
+
+  k11[m_idx3] <- n2gg[m_idx3]
+  k11[m_idx4] <- n2gg[m_idx4]
+
+
   k_a <- rbind(cbind(k00,k01),cbind(k10,k11))
   
   

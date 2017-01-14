@@ -4,12 +4,12 @@
 \alias{DEtimeKernDiagCompute}
 \title{Retrieve the diagonal of the DEtime kernel}
 \usage{
-DEtimeKernDiagCompute(kern, x)
+DEtimeKernDiagCompute(kern, X)
 }
 \arguments{
 \item{kern}{DEtime kernel structure to be computed}
 
-\item{x}{Depending on the number of inputs, x can be the input data matrix (rows are data points) to the kernel computation, or the first input matrix to the kernel computation (forms the rows of the kernel)}
+\item{X}{A two-column matrix where the first column of this matrix is the time points for control and perturbed conditions and the second column uses '1' to represent time points from control condition and '2' to represent time points from perturbed condition}
 }
 \value{
 Kd Vector containing computed diagonal elements of the kernel structure
@@ -18,12 +18,12 @@ Kd Vector containing computed diagonal elements of the kernel structure
 Retrieve the diagonal of the DEtime kernel matrix.
 }
 \details{
-\code{Kd <- DEtimekernDiagCompute(kern, x)} computes the diagonal of a DEtime kernel matrix for the given kernel.
+\code{Kd <- DEtimekernDiagCompute(kern, X)} computes the diagonal of a DEtime kernel matrix for the given kernel.
 }
 \examples{
 kern <- list()
 kern <- DEtimeKernParamInit(kern)
-K <- DEtimeKernCompute(kern, as.matrix(3:8))
-Kd <- DEtimeKernDiagCompute(kern, as.matrix(3:8))
+X <- matrix(c(seq(3:8),seq(4:8),rep(1,6),rep(2,5)),ncol=2)
+Kd <- DEtimeKernDiagCompute(kern, X)
 }
 

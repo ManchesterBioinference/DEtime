@@ -17,21 +17,21 @@ data(SimulatedData)
 ### This threshold is arbitrarily big and would not normally be used in practice.
 ### We adopt it here in order to reduce the running time of this example.
 
-res_rank <- DEtime_rank(times = times, ControlData = ControlData[1:2,], 
-  PerturbedData=PerturbedData[1:2,], replicate_no=replicate_no, gene_no=2, 
-  gene_ID=gene_ID[1:2], savefile=TRUE)
+res_rank <- DEtime_rank(ControlTimes = ControlTimes, 
+  ControlData = ControlData, PerturbedTimes = PerturbedTimes, 
+  PerturbedData=PerturbedData, savefile=TRUE)
 
 ### Get the index of these data with loglikelihood ratio larger than 45
 idx <- which(res_rank[,2]>45)
 
 if (length(idx)>0){
-    res <- DEtime_infer(times = times, ControlData = ControlData[idx,], PerturbedData=
-        PerturbedData[idx,], replicate_no=replicate_no, gene_no=length(idx), 
-        times_test=times, gene_ID=gene_ID[idx])
+    res <- DEtime_infer(ControlTimes = ControlTimes, 
+      ControlData = ControlData[idx,], PerturbedTimes = PerturbedTimes, 
+      PerturbedData = PerturbedData[idx,])
      ### Print a summary of the results
      print_DEtime(res)
      ### Plot the result of the gene with top loglikelihood ratio
-     plot_DEtime(res,gene_ID[idx[1]])
+     plot_DEtime(res,plot_gene_ID=as.character(idx))
  }
 }
 

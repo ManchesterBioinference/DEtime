@@ -9,11 +9,10 @@ In this experiment, the aim is to study the transcriptional change occuring in A
 }
 \details{
 \itemize{
-   \item times Simulated exprimental times
-   \item times_test Predefined perturbation time points
-   \item ControlData Time series data for perturbed condition 1
-   \item PerturbedData Time series data for perturbed condition 2
-   \item gene_ID ID for studied genes
+   \item ControlTimes Exprimental times for the perturbed condition 1
+   \item ControlData Time series measurements for the perturbed condition 1
+   \item PerturbedTimes Exprimental times for the perturbed condition 2
+   \item PerturbedData Time series measurements for the perturbed condition 2
   }
 }
 \examples{

@@ -6,11 +6,10 @@ Date: 2015-03-11
 Author: c(person("YANG","Jing", role =
     c("aut","cre","trl"), email = "ynnjing@gmail.com"))
 Imports:
-    gptk
-VignetteBuilder: knitr
+    spam,Matrix,gptk,AtmRay,graphics
 Maintainer: Jing Yang <ynnjing@gmail.com>
-Description: The DEtimeExtension package implements a toolkit for identifying
-    the perturbation time point for two time series profiles obtained under control
+Description: The DEtime package implements a toolkit for identifying the
+    perturbation time point for two time series profiles obtained under control
     and perturbed conditions. It applies a Gaussian Process Regression model to the
     dataset and derives the full posterior distribution of the proposed perturbation
     time points. See DEtime_vignettes.pdf for more details.
@@ -18,6 +17,9 @@ License: GPL-3
 BugReports: ynnjing@gmail.com
 NeedsCompilation: no
 Suggests:
-    testthat
-Packaged: 2015-04-09 22:40:00 UTC; mqbssjy5
+    testthat,
+    knitr,
+    rmarkdown
+Packaged: 2015-04-09 22:40:00 UTC
 RoxygenNote: 5.0.1
+VignetteBuilder: knitr
