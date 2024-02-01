@@ -1,3 +1,9 @@
+# New implementation in GPcounts package
+Note: some of the R-packages that DEtime relies on are no longer supported. 
+The model has been re-implemented in the GPcounts python package and can be used with a Gaussian or counts (negative binomial) likelihood. 
+See https://github.com/ManchesterBioinference/GPcounts/blob/master/demo_notebooks/Branching_GPcounts.ipynb for an example application there to single-cell pseudotime branching. 
+If using the DEtime kernel in GPcounts then please cite the GPcounts paper https://doi.org/10.1093/bioinformatics/btab486 as well as the original DEtime paper
+
 # DEtime
 DEtime is an R package for two-sample time series analysis using Gaussian process methods. 
 This package implements the Gaussian regression framework for perturbation time point inferrence in a two sample case. 
